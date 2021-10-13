@@ -32,6 +32,7 @@ navigator.mediaDevices
     audio: true,
   })
   .then((stream) => {
+    myVideoStream = stream
     addVideoStream(myVideo, stream);
     myPeer.on('call', call => {
       call.answer(stream);
@@ -40,6 +41,7 @@ navigator.mediaDevices
         addVideoStream(video, userVideoStream);
       });
     });
+
     socket.on('user-connected', userId => {
       connectToNewUser(userId, stream);
     });
@@ -79,6 +81,59 @@ function addVideoStream(video, stream) {
   });
   videoGrid.append(video);
 }
+
+/************************************ 버튼 기능 함수들 ************************************/
+
+const muteUnmute = () => {
+  const enabled = myVideoStream.getAudioTracks()[0].enabled;
+  if (enabled) {
+    myVideoStream.getAudioTracks()[0].enabled = false;
+    setUnmuteButton();
+    recognition.stop();
+  } else {
+    setMuteButton();
+    myVideoStream.getAudioTracks()[0].enabled = true;
+    recognition.start();
+  }
+}
+  
+const playStop = () => {
+  let enabled = myVideoStream.getVideoTracks()[0].enabled;
+  if (enabled) {
+    myVideoStream.getVideoTracks()[0].enabled = false;
+    setPlayVideo()
+  } else {
+    setStopVideo()
+    myVideoStream.getVideoTracks()[0].enabled = true;
+  }
+}
+
+const exit = () => {
+  if(confirm("회의에서 나가시겠습니까?")){
+    self.close()
+  }
+}
+
+const setMuteButton = () => { 
+  const html = `<i class="fas fa-microphone fa-lg"></i><span>Mic off</span>`
+  document.querySelector('.main__mute_button').innerHTML = html;
+}
+
+const setUnmuteButton = () => {
+  const html = `<i class="fas fa-microphone-slash fa-lg"></i><span>Mic on</span>`
+  document.querySelector('.main__mute_button').innerHTML = html;
+}
+
+const setStopVideo = () => { 
+  const html = `<i class="fas fa-video fa-lg"></i><span>Cam off</span>`
+  document.querySelector('.main__video_button').innerHTML = html;
+}
+
+const setPlayVideo = () => {
+  const html = `<i class="fas fa-video-slash fa-lg"></i><span>Cam on</span>`
+  document.querySelector('.main__video_button').innerHTML = html;
+}
+
 
 /************************************ 음성 인식 시작 \************************************/
 

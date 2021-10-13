@@ -7,6 +7,7 @@
   <script>
     const ROOM_ID = "<%= roomId %>";
   </script>
+  <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
   <script src="/socket.io/socket.io.js" defer></script>
   <script src="script.js" defer></script>
@@ -26,10 +27,55 @@
   </style>
 </head>
 <body>
-  <h1>Hello</h1>
-  <div id="video-grid"></div>
-  <div class="display-container">
-    <ul class="chatting-list"></ul>
+  <div class="main">
+    <div class="main__left">
+      <div class="main__videos" id="main__videos">
+        <div class="container" id="video-grid"></div>
+      </div>
+      <div class="main__controls">
+        <div class="main__controls__block">
+          <button onclick="muteUnmute()" class="main__controls__button main__mute_button">
+            <div class="main__controls__button_icon">
+              <i class="fas fa-microphone fa-lg"></i>
+            </div>
+            <span>Mic off</span>
+          </button>
+          <button onclick="playStop()" class="main__controls__button main__video_button">
+            <div class="main__controls__button_icon">
+              <i class="fas fa-video fa-lg"></i>
+            </div>
+            <span>Cam off</span>
+          </button>
+        </div>
+        <div class="main__controls__block">
+          <button onclick="exit()" class="main__controls__button">
+            <div class="main__controls__button">
+              <div class="main__controls__button_icon">
+                <i class="fas fa-door-open" style="color: red;"></i>
+              </div>
+              <span class="leave_meeting">EXIT</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="main__right">
+      <div class="dropdown">
+        <button onclick="memberList()" class="dropbtn">Chatting</button>
+        <div id="memberList" class="dropdown__content"></div>
+      </div>
+      <div id="chat">
+        <ul class="chatting-list"></ul>
+      </div>
+      <div class="main__message_container">
+        <input id="chat_message" type="text" placeholder="메시지를 입력하세요"></input>
+        <button class="main__message_button" onclick="send()">
+          <div class="main__controls__button_icon">
+            <i class="far fa-paper-plane"></i>
+          </div>
+        </button>
+      </div>
+    </div>
   </div>
 </body>
 </html>
