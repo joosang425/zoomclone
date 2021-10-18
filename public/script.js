@@ -1,30 +1,18 @@
 const socket = io('/');
-const videoGrid = document.getElementById('video-grid');
+
 const myPeer = new Peer();
+const peers = {};
+
+const videoGrid = document.getElementById('video-grid');
+
+const myVideoBx = document.createElement('div');
+const myNameTag = document.createElement('div');
 const myVideo = document.createElement('video');
 myVideo.muted = true;
-const peers = {};
 
 const chatlist = document.querySelector(".chatting-list");
 
-function checkTime(i) {
-  if (i < 10) {
-    i = "0" + i;
-  }
-  return i;
-}
-
-function getTime(){
-  var today = new Date();
-  var h = today.getHours();
-  var m = today.getMinutes();
-  // add a zero in front of numbers<10
-  m = checkTime(m);
-  var time = h + ":" + m;
-  return time;
-}
-
-
+let myVideoStream;
 // 유저의 브라우저로부터 Media Device들을 받아오는 과정
 navigator.mediaDevices
   .getUserMedia({
@@ -33,12 +21,14 @@ navigator.mediaDevices
   })
   .then((stream) => {
     myVideoStream = stream
-    addVideoStream(myVideo, stream);
+    addVideoStream(myVideoBx, myNameTag, myVideo, stream);
     myPeer.on('call', call => {
       call.answer(stream);
-      const video = document.createElement('video');
+      const callerVideoBx = document.createElement('div');
+      const callerNameTag = document.createElement('div');
+      const callerVideo = document.createElement('video');
       call.on('stream', (userVideoStream) => {
-        addVideoStream(video, userVideoStream);
+        addVideoStream(callerVideoBx, callerNameTag, callerVideo, userVideoStream);
       });
     });
 
@@ -63,23 +53,119 @@ myPeer.on('open', (id) => {
 
 function connectToNewUser(userId, stream) {
   const call = myPeer.call(userId, stream);
-  const video = document.createElement('video');
+  const calleeVideoBx = document.createElement('div');
+  const calleeNameTag = document.createElement('div')
+  const calleeVideo = document.createElement('video');
+
   call.on('stream', (userVideoStream) => {
-    addVideoStream(video, userVideoStream);
+    addVideoStream(calleeVideoBx, calleeNameTag, calleeVideo, userVideoStream);
   });
+
   call.on('close', () => {
-    video.remove();
+    removeVideoStream(calleeVideo, stream);
   });
 
   peers[userId] = call;
 }
 
-function addVideoStream(video, stream) {
+function addVideoStream(videoBx, nameTag, video, stream) {
+  videoBx.style.marginRight = '10px';
+  videoBx.style.marginBottom = '10px';
+
   video.srcObject = stream;
   video.addEventListener('loadedmetadata', () => {
     video.play();
   });
-  videoGrid.append(video);
+
+  videoBx.append(nameTag);
+  videoBx.append(video);
+
+  videoGrid.append(videoBx);
+
+  if(videoGrid.childElementCount > 4){
+    videoGrid.style.gridTemplateColumns = "1fr 1fr 1fr";
+  }
+}
+
+function removeVideoStream(video, stream) {
+  video.srcObject = stream;
+  const videoParent = video.parentNode;
+  videoGrid.removeChild(videoParent);
+  if(videoGrid.childElementCount <= 4) {
+    videoGrid.style.gridTemplateColumns = "1fr 1fr";
+  }
+}
+/************************************ 채팅 송수신 ************************************/
+
+$('html').keydown((e) => {
+  if (e.which == 13) {
+    send()
+  }
+})
+
+function send() {
+  var message = document.getElementById('chat_message').value;
+  if(message.length !== 0) {
+    document.getElementById('chat_message').value = '';
+
+    socket.emit('message', {type: 'message', message: message, time: getTime()});
+  }
+}
+
+function checkTime(i) {
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
+}
+
+function getTime(){
+  var today = new Date();
+  var h = today.getHours();
+  var m = today.getMinutes();
+  // add a zero in front of numbers<10
+  m = checkTime(m);
+  var time = h + ":" + m;
+  return time;
+}
+
+socket.on('updateChat', (data) => {
+  var chat = document.getElementById('chat')
+  var msg = document.createElement('div')
+  var bold = document.createElement('strong')
+  var className = ''
+
+  if(data.type == "system") {
+    var node = document.createTextNode(`${data.message}`)
+    bold.append(node)
+    msg.appendChild(bold)
+  }
+  else {
+    var part1 = document.createTextNode(`${data.time}`)
+    var part2 = document.createTextNode(`${data.message}`)
+    var br = document.createElement('br')
+  
+    msg.appendChild(part2)
+    msg.appendChild(br)
+    msg.appendChild(part1)
+  }
+
+  switch(data.type) {
+    case 'message':
+      className = 'other'
+      break
+    case 'system':
+      className = 'system'
+      break
+  }
+
+  msg.classList.add(className)
+  chat.appendChild(msg)
+  scrollToBottom()
+})
+
+const scrollToBottom = () => {
+  $('#chat').scrollTop($('#chat').prop("scrollHeight"));
 }
 
 /************************************ 버튼 기능 함수들 ************************************/

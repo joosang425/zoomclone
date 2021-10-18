@@ -1,6 +1,6 @@
 @font-face{
   font-family: 'Nanum Square';
-  src: url(./NanumSquareR.ttf) format('truetype');
+  src: url("./NanumSquareR.ttf") format('truetype');
 }
 
 body {
@@ -143,7 +143,7 @@ video {
 }
 
 .main__message_button {
-  color:#000; 
+  color:#ffffff; 
   background:#ff9999;
   border-radius: 0.5em; 
   padding: 5px 20px;
