@@ -23,7 +23,7 @@ io.on('connection', socket => {
     user = userId
 
     socket.join(room)
-    socket.to(room).broadcast.emit('user-connected', user)  // socket.io downgrade 필수
+    socket.to(room).broadcast.emit('user-connected', user) 
   })
 
   socket.on('disconnect', () => {
@@ -35,5 +35,5 @@ io.on('connection', socket => {
   })
 })
 
-let port = process.env.PORT || 3000
-server.listen(port)
+var PORT = process.env.PORT || 3000;
+server.listen(PORT)

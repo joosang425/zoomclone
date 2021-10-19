@@ -6,11 +6,10 @@ const peers = {};
 const videoGrid = document.getElementById('video-grid');
 
 const myVideoBx = document.createElement('div');
-const myNameTag = document.createElement('div');
 const myVideo = document.createElement('video');
-myVideo.muted = true;
-
 const chatlist = document.querySelector(".chatting-list");
+
+myVideo.muted = true;
 
 let myVideoStream;
 // 유저의 브라우저로부터 Media Device들을 받아오는 과정
@@ -21,14 +20,13 @@ navigator.mediaDevices
   })
   .then((stream) => {
     myVideoStream = stream
-    addVideoStream(myVideoBx, myNameTag, myVideo, stream);
+    addVideoStream(myVideoBx, myVideo, stream);
     myPeer.on('call', call => {
       call.answer(stream);
       const callerVideoBx = document.createElement('div');
-      const callerNameTag = document.createElement('div');
-      const callerVideo = document.createElement('video');
+      const video = document.createElement('video');
       call.on('stream', (userVideoStream) => {
-        addVideoStream(callerVideoBx, callerNameTag, callerVideo, userVideoStream);
+        addVideoStream(callerVideoBx, video, userVideoStream);
       });
     });
 
@@ -54,21 +52,18 @@ myPeer.on('open', (id) => {
 function connectToNewUser(userId, stream) {
   const call = myPeer.call(userId, stream);
   const calleeVideoBx = document.createElement('div');
-  const calleeNameTag = document.createElement('div')
-  const calleeVideo = document.createElement('video');
-
+  const video = document.createElement('video');
   call.on('stream', (userVideoStream) => {
-    addVideoStream(calleeVideoBx, calleeNameTag, calleeVideo, userVideoStream);
+    addVideoStream(calleeVideoBx, video, userVideoStream);
   });
-
   call.on('close', () => {
-    removeVideoStream(calleeVideo, stream);
+    removeVideoStream(video, stream);
   });
 
   peers[userId] = call;
 }
 
-function addVideoStream(videoBx, nameTag, video, stream) {
+function addVideoStream(videoBx, video, stream) {
   videoBx.style.marginRight = '10px';
   videoBx.style.marginBottom = '10px';
 
@@ -77,12 +72,11 @@ function addVideoStream(videoBx, nameTag, video, stream) {
     video.play();
   });
 
-  videoBx.append(nameTag);
   videoBx.append(video);
 
   videoGrid.append(videoBx);
 
-  if(videoGrid.childElementCount > 4){
+  if(videoGrid.childElementCount > 4) {
     videoGrid.style.gridTemplateColumns = "1fr 1fr 1fr";
   }
 }
@@ -91,10 +85,12 @@ function removeVideoStream(video, stream) {
   video.srcObject = stream;
   const videoParent = video.parentNode;
   videoGrid.removeChild(videoParent);
+
   if(videoGrid.childElementCount <= 4) {
     videoGrid.style.gridTemplateColumns = "1fr 1fr";
   }
 }
+
 /************************************ 채팅 송수신 ************************************/
 
 $('html').keydown((e) => {
@@ -201,22 +197,22 @@ const exit = () => {
 }
 
 const setMuteButton = () => { 
-  const html = `<i class="fas fa-microphone fa-lg"></i><span>Mic off</span>`
+  const html = `<span>Mic off</span>`
   document.querySelector('.main__mute_button').innerHTML = html;
 }
 
 const setUnmuteButton = () => {
-  const html = `<i class="fas fa-microphone-slash fa-lg"></i><span>Mic on</span>`
+  const html = `<span>Mic on</span>`
   document.querySelector('.main__mute_button').innerHTML = html;
 }
 
 const setStopVideo = () => { 
-  const html = `<i class="fas fa-video fa-lg"></i><span>Cam off</span>`
+  const html = `<span>Cam off</span>`
   document.querySelector('.main__video_button').innerHTML = html;
 }
 
 const setPlayVideo = () => {
-  const html = `<i class="fas fa-video-slash fa-lg"></i><span>Cam on</span>`
+  const html = `<span>Cam on</span>`
   document.querySelector('.main__video_button').innerHTML = html;
 }
 
