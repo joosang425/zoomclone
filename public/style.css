@@ -5,7 +5,7 @@
   } */
   
   body {
-    font-family: 'NanumSquare';
+    font-family: '/NanumSquareR.ttf';
     margin: 0;
     padding: 0;
   }
@@ -27,7 +27,7 @@
     width: 15%;
     height: 30%;
     object-fit: cover;
-    transform: rotateY(180deg);
+    /*transform: rotateY(180deg);*/
   }
   #video-grid {
     grid-auto-rows: 300px;

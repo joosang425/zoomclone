@@ -12,6 +12,7 @@ const chatlist = document.querySelector(".chatting-list");
 myVideo.muted = true;
 
 let myVideoStream;
+let currentPeer;
 // 유저의 브라우저로부터 Media Device들을 받아오는 과정
 navigator.mediaDevices
   .getUserMedia({
@@ -27,6 +28,7 @@ navigator.mediaDevices
       const video = document.createElement('video');
       call.on('stream', (userVideoStream) => {
         addVideoStream(callerVideoBx, video, userVideoStream);
+        currentPeer = call.peerConnection
       });
     });
 
@@ -55,6 +57,7 @@ function connectToNewUser(userId, stream) {
   const video = document.createElement('video');
   call.on('stream', (userVideoStream) => {
     addVideoStream(calleeVideoBx, video, userVideoStream);
+    currentPeer = call.peerConnection
   });
   call.on('close', () => {
     removeVideoStream(video, stream);
@@ -177,6 +180,37 @@ const muteUnmute = () => {
     myVideoStream.getAudioTracks()[0].enabled = true;
     recognition.start();
   }
+}
+
+const shareScreen = () => {
+  navigator.mediaDevices.getDisplayMedia({
+    video: {
+      cursor: "always"
+    },
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true
+    }
+  }).then((stream) => {
+    let videoTrack = stream.getVideoTracks()[0];
+    videoTrack.onended = function() {
+      stopScreenShare();
+    }
+    let sender = currentPeer.getSenders().find(function(s) {
+      return s.track.kind == videoTrack.kind
+    })
+    sender.replaceTrack(videoTrack)
+  }).catch((err) => {
+    console.log("unable to get display media" + err)
+  })
+}
+
+const stopScreenShare = () => {
+  let videoTrack = myVideoStream.getVideoTracks()[0];
+  var sender = currentPeer.getSenders().find(function(s) {
+    return s.track.kind == videoTrack.kind;
+  })
+  sender.replaceTrack(videoTrack)
 }
   
 const playStop = () => {
