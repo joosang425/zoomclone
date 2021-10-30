@@ -11,6 +11,7 @@
   <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
   <script src="/socket.io/socket.io.js" defer></script>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/1753889e54.js" crossorigin="anonymous"></script>
   <script src="script.js" defer></script>
   <title>MeetingNote</title>
   <style>
@@ -31,8 +32,8 @@
         <div class="main__controls__block">
           <button onclick="muteUnmute()" class="main__controls__button main__mute_button">
             <div class="main__controls__button_icon">
-              <i class="fas fa-microphone fa-lg"></i>
-            </div>
+               <i class="fas fa-microphone fa-lg"></i>
+             </div> 
             <span>Mic off</span>
           </button>
           <button onclick="playStop()" class="main__controls__button main__video_button">
@@ -43,7 +44,7 @@
           </button>
           <button onclick="shareScreen()" class="main__controls__button main__screen_button">
             <div class="main__controls__button_icon">
-              <i class="fas fa-screen fa-lg"></i>
+              <i class="fas fa-share-alt fa-lg"></i>
             </div>
             <span>Share Screen</span>
           </button>
@@ -52,7 +53,7 @@
           <button onclick="exit()" class="main__controls__button">
             <div class="main__controls__button">
               <div class="main__controls__button_icon">
-                <i class="fas fa-door-open" style="color: red;"></i>
+                <i class="fas fa-door-open" style="color: black;"></i>
               </div>
               <span class="leave_meeting">EXIT</span>
             </div>

@@ -20,7 +20,7 @@
     border-radius: 0.5em;
     padding: 10px;
     text-align: center;
-    font-size: 16px;
+    font-size: 15px;
   }
   video {
     /*모니터 크기에 따라 비디오 크기 변경되도록.. 다시 조정 필요*/
@@ -106,7 +106,8 @@
   }
   
   .main__controls__button i {
-    font-size: 24px;
+    font-size: 15px;
+    margin-bottom: 5px;
   }
   
   .main__right {

@@ -231,22 +231,22 @@ const exit = () => {
 }
 
 const setMuteButton = () => { 
-  const html = `<span>Mic off</span>`
+  const html = `<i class="fas fa-microphone fa-lg"></i><span>Mic off</span>`
   document.querySelector('.main__mute_button').innerHTML = html;
 }
 
 const setUnmuteButton = () => {
-  const html = `<span>Mic on</span>`
+  const html = `<i class="fas fa-microphone-slash fa-lg"></i><span>Mic on</span>`
   document.querySelector('.main__mute_button').innerHTML = html;
 }
 
 const setStopVideo = () => { 
-  const html = `<span>Cam off</span>`
+  const html = `<i class="fas fa-video fa-lg"></i><span>Cam off</span>`
   document.querySelector('.main__video_button').innerHTML = html;
 }
 
 const setPlayVideo = () => {
-  const html = `<span>Cam on</span>`
+  const html = `<i class="fas fa-video-slash fa-lg"></i><span>Cam on</span>`
   document.querySelector('.main__video_button').innerHTML = html;
 }
 
