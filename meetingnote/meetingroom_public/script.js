@@ -1,6 +1,8 @@
 const socket = io('/');
 
-const myPeer = new Peer();
+const myPeer = new Peer(USER_ID, { 
+});
+
 const peers = {};
 
 const videoGrid = document.getElementById('video-grid');
@@ -223,6 +225,10 @@ const playStop = () => {
     myVideoStream.getVideoTracks()[0].enabled = true;
   }
 }
+
+$(window).on('beforeunload', function() {
+  opener.location.reload()
+});
 
 const exit = () => {
   if(confirm("회의에서 나가시겠습니까?")){

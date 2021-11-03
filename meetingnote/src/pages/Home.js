@@ -103,7 +103,6 @@ export default function SignIn() {
           name = "password"
           label = "비밀번호 입력"
           type = "password"
-          autoFocus
           value = { pw }
           size = "medium"
           onChange = { ( { target: { value } } ) => setPw(value)}
