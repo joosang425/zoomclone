@@ -1,16 +1,33 @@
 const socket = io('/');
 
-const myPeer = new Peer(USER_ID, { 
+const peer = new Peer(USER_ID, { 
 });
 
 const peers = {};
 
+let room_id, user_id, user_name;
+
+peer.on('open', peerid => {
+  room_id = ROOM_ID;
+  user_id = USER_ID;
+  user_name = USER_NAME;
+  console.log('[PEER CONNECTED]' + room_id, user_id, user_name);
+  socket.emit('joinRoom', room_id, user_id, user_name);
+});
+
+socket.on('connect', function() {
+  room_id = ROOM_ID;
+  user_id = USER_ID;
+  user_name = USER_NAME;
+  console.log('[SOCKET CONNECTED]' + room_id, user_id, user_name);
+});
+
 const videoGrid = document.getElementById('video-grid');
 
 const myVideoBx = document.createElement('div');
+const myNameTag = document.createElement('div');
 const myVideo = document.createElement('video');
-const chatlist = document.querySelector(".chatting-list");
-
+/*const chatlist = document.querySelector(".chatting-list");*/
 myVideo.muted = true;
 
 let myVideoStream;
@@ -23,44 +40,43 @@ navigator.mediaDevices
   })
   .then((stream) => {
     myVideoStream = stream
-    addVideoStream(myVideoBx, myVideo, stream);
-    myPeer.on('call', call => {
+    user_name = USER_NAME
+    addVideoStream(myVideoBx, myNameTag, myVideo, user_name, stream);
+
+    peer.on('call', call => {
       call.answer(stream);
       const callerVideoBx = document.createElement('div');
+      const callerNameTag = document.createElement('div');
       const video = document.createElement('video');
+      var callerName = call.metadata.callerName;
       call.on('stream', (userVideoStream) => {
-        addVideoStream(callerVideoBx, video, userVideoStream);
+        addVideoStream(callerVideoBx, callerNameTag, video, callerName, userVideoStream);
         currentPeer = call.peerConnection
       });
     });
 
-    socket.on('user-connected', userId => {
-      connectToNewUser(userId, stream);
+    socket.on('userConnected', data => {
+      connectToNewUser(data.id, data.name, stream);
     });
 });
 
-socket.on('message', data => {
+/*socket.on('message', data => {
   const li = document.createElement("li");
   li.innerHTML = `${data.message} - ${data.time}`
   chatlist.appendChild(li);
-})
+})*/
 
-socket.on('user-disconnected', userId => {
-  if (peers[userId]) peers[userId].close();
-});
-
-myPeer.on('open', (id) => {
-  socket.emit('join-room', ROOM_ID, id);
-});
-
-function connectToNewUser(userId, stream) {
-  const call = myPeer.call(userId, stream);
+function connectToNewUser(userId, calleeName, stream) {
+  const call = peer.call(userId, stream, {metadata: {callerName: USER_NAME}});
   const calleeVideoBx = document.createElement('div');
+  const calleeNameTag = document.createElement('div');
   const video = document.createElement('video');
+
   call.on('stream', (userVideoStream) => {
-    addVideoStream(calleeVideoBx, video, userVideoStream);
+    addVideoStream(calleeVideoBx, calleeNameTag, video, calleeName, userVideoStream);
     currentPeer = call.peerConnection
   });
+
   call.on('close', () => {
     removeVideoStream(video, stream);
   });
@@ -68,17 +84,20 @@ function connectToNewUser(userId, stream) {
   peers[userId] = call;
 }
 
-function addVideoStream(videoBx, video, stream) {
+function addVideoStream(videoBx, nameTag, video, userName, stream) {
   videoBx.style.marginRight = '10px';
-  videoBx.style.marginBottom = '10px';
+
+  let nameText = document.createTextNode(userName);
+  nameTag.className = 'nameTag';
+  if(!nameTag.hasChildNodes())  nameTag.appendChild(nameText);
 
   video.srcObject = stream;
   video.addEventListener('loadedmetadata', () => {
     video.play();
   });
 
+  videoBx.append(nameTag);
   videoBx.append(video);
-
   videoGrid.append(videoBx);
 
   if(videoGrid.childElementCount > 4) {
@@ -96,6 +115,10 @@ function removeVideoStream(video, stream) {
   }
 }
 
+socket.on('userDisconnected', userId => {
+  if (peers[userId]) peers[userId].close();
+});
+
 /************************************ 채팅 송수신 ************************************/
 
 $('html').keydown((e) => {
@@ -109,6 +132,7 @@ function send() {
   if(message.length !== 0) {
     document.getElementById('chat_message').value = '';
 
+    socket.emit('message', {type: 'mymessage', message: message, time: getTime()});
     socket.emit('message', {type: 'message', message: message, time: getTime()});
   }
 }
@@ -137,21 +161,27 @@ socket.on('updateChat', (data) => {
   var className = ''
 
   if(data.type == "system") {
-    var node = document.createTextNode(`${data.message}`)
-    bold.append(node)
+    var node = document.createTextNode(`${data.name}  ${data.message}`)
+    bold.appendChild(node)
     msg.appendChild(bold)
   }
   else {
-    var part1 = document.createTextNode(`${data.time}`)
-    var part2 = document.createTextNode(`${data.message}`)
+    var part1 = document.createTextNode(`${data.name}`)
+    var part2 = document.createTextNode(`${data.time}`)
+    var part3 = document.createTextNode(`${data.message}`)
     var br = document.createElement('br')
   
+    bold.appendChild(part1)
+    msg.appendChild(bold)
     msg.appendChild(part2)
     msg.appendChild(br)
-    msg.appendChild(part1)
+    msg.appendChild(part3)
   }
 
   switch(data.type) {
+    case 'mymessage':
+      className = 'me'
+      break
     case 'message':
       className = 'other'
       break
@@ -205,6 +235,21 @@ const shareScreen = () => {
   }).catch((err) => {
     console.log("unable to get display media" + err)
   })
+}
+
+function copyToClipboard(val) {
+  var t = document.createElement("textarea");
+  document.body.appendChild(t);
+  t.value = val;
+  t.select();
+  document.execCommand('copy');
+  document.body.removeChild(t);
+}
+
+const linkShare = () => {
+  console.log(room_id);
+  copyToClipboard(room_id);
+  alert("회의 방 ID가 복사되었습니다.");
 }
 
 const stopScreenShare = () => {
@@ -295,7 +340,7 @@ recognition.onresult = function(event) {
     speechContent += transcript;
   }
 
-  //socket.emit('message', {type: 'mymessage', message: speechContent, time: getTime('mymessage')})
+  socket.emit('message', {type: 'mymessage', message: speechContent, time: getTime('mymessage')})
   socket.emit('message', {type: 'message', message: speechContent, time: getTime('message')})
 
   speechContent = '';
@@ -310,6 +355,9 @@ recognition.onend = function() {
   console.log("ONEND");
   recognition.stop();
   recognizing = false;
+  if(myVideoStream.getAudioTracks()[0].enabled) {
+    recognition.start()
+  }
 }
 
 recognition.onerror = function(event) {

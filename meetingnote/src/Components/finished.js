@@ -22,10 +22,10 @@ const useStyles = makeStyles((theme) => ({
       }
   },
   Chip: {
-      backgroundColor: "#ffc31e",
+      backgroundColor: "#3f51b5",
       marginTop:"1%",
       marginRight:"3%",
-      height:"10%",
+      height:"15%",
       fontSize: 14
   },
   ScriptChip: {
@@ -47,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
       margin:"auto",
       borderRadius:10,
       padding:0,
+      marginTop: "5%",
       marginBottom:"2%",
   },
   ScheduledName: {
@@ -60,44 +61,6 @@ const useStyles = makeStyles((theme) => ({
           color: "#ffa0a0",
       },
   },
-  grow: {
-      flexGrow: "1%",
-      paddingTop: "2%",
-      marginBottom: "2%",
-    },
-  search: {
-      position: 'relative',
-      borderRadius: 20,
-      backgroundColor: "#A9A9A9",
-      marginRight: "1%",
-      marginLeft: "3%",
-      width: '94%',
-    },
-  searchIcon: {
-      marginLeft:"5%",
-      height: '100%',
-      position: 'absolute',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  inputRoot: {
-      color: 'inherit',
-      width: "75%",
-    },
-  inputInput: {
-      paddingTop: "3%",
-      paddingBottom: "3%",
-      paddingLeft: "3%",
-      width: '100%'
-    },
-  cancelBtn:{
-      color:"#eaeaea", 
-      verticalAlign:'middle',
-      "&:hover": {
-          color: "#000000",
-      },
-  }
 }));
 
 export default function Finished(prop) {
@@ -105,19 +68,14 @@ export default function Finished(prop) {
     const [list, setList] = useState([]);
 
     const getList = (prop) => {
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type","appliction/json");
 
-        var raw = JSON.stringify({ "meet_id": prop.meet_id});
-
-        var requestOptions = {
-            method: 'POST',
+        fetch("/meet_list", {
+            method: "POST",
             headers: myHeaders,
-            body: raw,
-            redirect: 'follow'
-        };
-
-        fetch("/finishedmeet_list", requestOptions)
+            redirect: "follow"  
+        })
             .then(res => res.json())
             .then(result => {                
                 console.log(result)
@@ -135,11 +93,11 @@ export default function Finished(prop) {
         getList(prop);
       }, [prop]);
 
-    const handleClickScript =(meet_id) => {
+    const handleClickScript =(meet_name) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        var raw = JSON.stringify({ "meet_id": meet_id});
+        var raw = JSON.stringify({ "meet_name": meet_name});
 
         var requestOptions = {
             method: 'POST',
@@ -148,12 +106,12 @@ export default function Finished(prop) {
             redirect: 'follow'
         };
 
-        fetch("/finishedmeet-open", requestOptions)
+        fetch("/meet_open", requestOptions)
             .then(res => res.json())
             .then(result => {
                 console.log(result)
                 if(result.code === 0) {
-                    window.location.href=`/script?meet_id=${meet_id}`;
+                    window.location.href=`/script?meet_name=${meet_name}`;
                 }
                 else if(result.code === 37){
                     alert("스크립트가 삭제되었거나, 유효하지 않은 스크립트입니다.");
@@ -162,11 +120,11 @@ export default function Finished(prop) {
             .catch(error => console.log('error', error))
     }
 
-    const handleDeleteIcon = (meet_id) => {
+    const handleDeleteIcon = (meet_name) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
     
-        var raw = JSON.stringify({ "meet_id": meet_id });
+        var raw = JSON.stringify({ "meet_name": meet_name });
     
         var requestOptions = {
             method: 'POST',
@@ -175,7 +133,7 @@ export default function Finished(prop) {
             redirect: 'follow'
         };
     
-        fetch("/finishedmeet-delete", requestOptions)
+        fetch("/meet_delete", requestOptions)
             .then(res => res.json())
             .then(result => {
                 console.log(result);
@@ -195,18 +153,20 @@ export default function Finished(prop) {
         </Typography>
         <div style={{backgroundColor:"#eaeaea", width:"90%", height:"85%",borderRadius:10, margin:"auto"}}>
         <List className={classes.list}>
-            {list && list.map(data => (
-                <ListItem key={data.meet_id} id='data' className={classes.data}>
-                    <div style={{display:'block', width:"100%", margin:"2%"}}>
-                        <div className={classes.ScheduledName}>
-                        <DeleteForever onClick={()=> handleDeleteIcon(data.meet_id)} className={classes.deleteBtn} color="error"/>
-                        </div>
-                        <Grid>
-                            <Chip className={classes.ScriptChip} id="script" onClick={() => handleClickScript(data.meet_id)} icon={<DescriptionIcon style={{ color: "white" }}/>} label="SCRIPT"/>
-                        </Grid>
-                    </div>
-                </ListItem>
-            ))}
+        {list && list.map(data => (
+                        <ListItem key={data.meet_name} id='data' className={classes.data}>
+                            <div style={{display:'block', width:"100%", margin:"2%"}}>
+                                <div className={classes.ScheduledName}>
+                                <DeleteForever onClick={()=> handleDeleteIcon(data.meet_name)} className={classes.deleteBtn} color="error"/>
+                                <span style={{fontWeight:"bold"}}>{data.meet_name}</span>
+                                </div>
+                                <Grid>
+                                    <Chip className={classes.Chip} id="meet_date" label={data.meet_date}/>
+                                    <Chip className={classes.ScriptChip} id="script" onClick={() => handleClickScript(data.meet_name)} icon={<DescriptionIcon style={{ color: "white" }}/>} label="SCRIPT"/>
+                                </Grid>
+                            </div>
+                        </ListItem>
+                    ))}
         </List>
         </div>
     </Paper> 

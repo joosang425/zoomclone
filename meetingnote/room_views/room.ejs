@@ -52,13 +52,17 @@
           </button>
         </div>
         <div class="main__controls__block">
-          <button onclick="exit()" class="main__controls__button">
-            <div class="main__controls__button">
-              <div class="main__controls__button_icon">
-                <i class="fas fa-door-open" style="color: black;"></i>
-              </div>
-              <span class="leave_meeting">EXIT</span>
+          <button onclick="linkShare()" class="main__controls__button main__lick_button">
+            <div class="main__controls__button_icon">
+              <i class="fas fa-share-alt fa-lg"></i>
             </div>
+            <span>Share Link</span>
+          </button>
+          <button onclick="exit()" class="main__controls__button main__exit_button">
+            <div class="main__controls__button_icon">
+              <i class="fas fa-door-open" style="color: black;"></i>
+            </div>
+            <span>EXIT</span>
           </button>
         </div>
       </div>
@@ -69,7 +73,6 @@
         <div id="memberList" class="dropdown__content"></div>
       </div>
       <div id="chat">
-        <ul class="chatting-list"></ul>
       </div>
       <div class="main__message_container">
         <input id="chat_message" type="text" placeholder="메시지를 입력하세요"></input>
