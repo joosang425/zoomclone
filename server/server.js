@@ -90,7 +90,6 @@ io.on('connection', socket => {
     console.log(rooms[room])
     if(rooms[room].num == 0){
       var contentInput = rooms[room].contentArray.toString();
-      var chatInput = rooms[room].chatArray.toString();
 
       var sql = 'update meet set  meet_content=? where meet_id = ?';
       mysqlDB.query(sql, [contentInput,room], function (err, results) {
@@ -160,7 +159,6 @@ sub.on('message', function(channel, message){
       summary = msg.data;
       break;
     case 'finish':
-      console.log("DB INPUT \n[wc]: "+wordcloud+"\n[summary]: "+summary);
       inputDB(msg.room);
       break;
   }

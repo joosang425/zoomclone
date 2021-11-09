@@ -12,7 +12,7 @@
     "dev:python": "cd server && python analysis.py",
     "dev:flaskServer": "cd server && set FLASK_ENV=development && python app.py",
     "dev:server": "cd server && nodemon server.js",
-    "dev:meetingnote": "cd meetingnote && npm start"
+    "dev:meetingnote": "cd meetingnote && react-scripts start && npm start"
   },
   "keywords": [],
   "author": "",
