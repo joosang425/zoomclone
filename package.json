@@ -1,7 +1,25 @@
 {
   "name": "zoomcrone",
   "version": "1.0.0",
-  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"cd server && node server.js\" \"cd server && PYTHON_ENV=production python analysis.py\"",
+    "build": "cd meetingnote && react-scripts build",
+    "test": "cd meetingnote && react-scripts test",
+    "eject": "cd meetingnote && react-scripts eject",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:python\" \"npm run dev:meetingnote\"",
+    "dev:python": "cd server && python analysis.py",
+    "dev:flaskServer": "cd server && set FLASK_ENV=development && python app.py",
+    "dev:server": "cd server && nodemon server.js",
+    "dev:meetingnote": "cd meetingnote && react-scripts start && npm start"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "@date-io/date-fns": "^2.11.0",
     "@material-ui/core": "^4.12.3",
@@ -45,36 +63,7 @@
     "web-vitals": "^2.1.2",
     "yarn": "^1.22.15"
   },
-  "scripts": {
-    "start": "concurrently \"cd server && node server.js\" \"cd server && PYTHON_ENV=production python analysis.py\"",
-    "build": "cd meetingnote && react-scripts build",
-    "test": "cd meetingnote && react-scripts test",
-    "eject": "cd meetingnote && react-scripts eject",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:python\" \"npm run dev:meetingnote\"",
-    "dev:python": "cd server && python analysis.py",
-    "dev:flaskServer": "cd server && set FLASK_ENV=development && python app.py",
-    "dev:server": "cd server && nodemon server.js",
-    "dev:meetingnote": "cd meetingnote && react-scripts start && npm start"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserlist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version", 
-      "last 1 safari version"
-    ]
-  },
-  "engines": {
-    "node": "14.x"
+  "devDependencies": {
+    "nodemon": "^2.0.14"
   }
 }
