@@ -46,7 +46,6 @@ export default function Scheduled(prop) {
   const [meet_name, setMeetName] = useState('');
 
   const handleEnterMeet = () => {
-    var meet_id = sessionStorage.getItem("meet_id");
     var user_id = sessionStorage.getItem("user_id");
     var user_name = sessionStorage.getItem("user_name");
 
@@ -57,7 +56,7 @@ export default function Scheduled(prop) {
       var myHeaders = new Headers();
       myHeaders.append("Content-Type","application/json");
   
-      var raw = JSON.stringify({ "meet_name": keywords});
+      var raw = JSON.stringify({ "meet_id": keywords});
   
       var requestOptions = {
         method: "POST",
@@ -72,7 +71,7 @@ export default function Scheduled(prop) {
         console.log(result);
         if(result.code === 0) {
           alert("회의에 입장합니다");
-          window.open(`/meeting?meet_id=${meet_id}&user_id=${user_id}&user_name=${user_name}`, 'Lets MeetingNote');
+          window.open(`/meeting?meet_id=${result.id}&user_id=${user_id}&user_name=${user_name}`, 'Lets MeetingNote');
         }
         else if (result.code === 31) {
           alert("삭제된 회의입니다.");
@@ -113,7 +112,7 @@ export default function Scheduled(prop) {
         console.log(result);
         if(result.code === 0) {
           alert("회의에 입장합니다");
-          window.open(`/meeting?meet_name=${meet_name}&user_id=${user_id}&user_name=${user_name}`, 'Lets MeetingNote');
+          window.open(`/meeting?meet_id=${result.id}&user_id=${user_id}&user_name=${user_name}`, 'Lets MeetingNote');
         }
       })
       .catch(error => console.log('error', error))

@@ -1,6 +1,8 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import MeetScript from "../Components/Meetscript";
+import Summary from "../Components/summary";
+import ScriptTitle from "../Components/scriptTitle";
 
 const useStyles = makeStyles((theme) => ({
   listTitle: {
@@ -22,17 +24,21 @@ function getUrlParams() {
 
 export default function Script() {
   const classes = useStyles();
-  const meet_name = getUrlParams().meet_name;
+  const meet_id = getUrlParams().meet_id;
 
   return (
-    <div style={{ display: "flex", minWidth: 1230}}>
-      <div style={{width: "100%", height: "90%"}}>
-        <div className={classes.body}>
-          <div style={{height: "88%", width: "98%", justifyContent: "center"}}>
-            <MeetScript meet_name={meet_name}/>
-          </div>
-        </div>
+    <div style={{ display: "flex", minWidth: 1230 }}>
+      <div style={{width: "100%", height:"90%"}}>
+            <div className={classes.body}>
+              < ScriptTitle meet_id={meet_id} />
+              <div style={{ display: "flex", height: "88%", width: "95%", justifyContent:"center"}}>
+                <div style={{ height: "88%", width: "98%", justifyContent:"center"}}>
+                  < Summary meet_id={meet_id} />  
+                </div>
+                < MeetScript meet_id={meet_id} />
+              </div>
+            </div>
       </div>
     </div>
-  )
+  );
 }

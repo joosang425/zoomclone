@@ -14,6 +14,7 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 app.use('/peerjs', peerServer);
+
 app.use(bodyParser.json());
 
 function getToday() {
@@ -84,31 +85,153 @@ io.on('connection', socket => {
   })
 
   socket.on('disconnect', () => {
-    socket.to(room).broadcast.emit('userDisconnected', id)
+    rooms[room].members = rooms[room].members.filter((item) => item!=name)
+    rooms[room].num = rooms[room].members.length
+    console.log(rooms[room])
+    if(rooms[room].num == 0){
+      var contentInput = rooms[room].contentArray.toString();
+      var chatInput = rooms[room].chatArray.toString();
+
+      var sql = 'update meet set  meet_content=? where meet_id = ?';
+      mysqlDB.query(sql, [contentInput,room], function (err, results) {
+        if (err) console.log(err);
+        else console.log('success input meetscript');
+      });
+      
+      var msg = {'contents': contentInput,'room': room} // members는 말한 적 있는 사람만
+      pub.publish('analysis_channel', JSON.stringify(msg));
+
+      //scheduled meet 에서 삭제
+      sql = 'UPDATE MEET SET ISFINISH = 1 WHERE MEET_ID=?';
+      mysqlDB.query(sql, room, function (err, results) {
+        if (err) console.log(err);
+        else console.log('success delete scheduled meet');
+      });
+
+      delete rooms[room]
+    }
+    else{
+      socket.to(room).broadcast.emit('userDisconnected', id)
+    }
+   
   })
 })
+
+/******************************redis *********************************/
+
+const redis = require('redis');
+const { Server } = require('http');
+var pub,sub
+
+if (process.env.NODE_ENV == 'production') {
+  pub = redis.createClient(process.env.REDIS_URL);
+  sub = redis.createClient(process.env.REDIS_URL);
+  sub.subscribe('server');
+  sub.on('subscribe', function() {
+    console.log("=== Redis 연결 ===");
+  })
+}
+
+else {
+  pub = redis.createClient({
+    host:'localhost',
+    port: 6379,
+    db: 0
+  })
+  sub = redis.createClient({
+    host:'localhost',
+    port: 6379,
+    db: 0
+  })
+  
+  sub.subscribe('server');
+  sub.on('subscribe',function(){
+    console.log("=== Redis 연결 ===");
+  })
+}
+
+sub.on('message', function(channel, message){
+  var msg = JSON.parse(message);
+  switch(msg.type){
+    case 'wordcloud':
+      wordcloud = msg.data;
+      break;
+    case 'summary':
+      summary = msg.data;
+      break;
+    case 'finish':
+      console.log("DB INPUT \n[wc]: "+wordcloud+"\n[summary]: "+summary);
+      inputDB(msg.room);
+      break;
+  }
+})
+
+var wordcloud = null, summary = null;
+
+var inputDB = function(room){
+  var sql = 'update meet set meet_wordcloud=?, meet_summary=? where meet_id=?';
+  mysqlDB.query(sql, [wordcloud, summary,room], function(err, results){
+    if(err) console.log(err);
+    else {
+      console.log('success input finishedmeet');
+    }
+  });
+}
 
 /******************************DB 연결 *********************************/
 
 var mysqlDB;
 
-var db_config = {
-  host: 'localhost',
-  port: 3306,
-  user: 'joosang',
-  password: 'joosang25^',
-  database: 'mydb'
-};
+if (process.env.NODE_ENV == 'production') {
+  var db_config = {
+    host: 'us-cdbr-east-04.cleardb.com',
+    port: 3306,
+    user: 'bbad6aa47dd3cf',
+    password: 'b95a05e9',
+    database: 'heroku_5ca53afc9e412f3'
+  };
 
-mysqlDB = mysql.createConnection(db_config);
+  mysqlDB = mysql.createPool(db_config)
+}
 
-/******************************frontend *********************************/
+else {
+  var db_config = {
+    host: 'localhost',
+    port: 3306,
+    user: 'joosang',
+    password: 'joosang25^',
+    database: 'mydb'
+  };
+  
+  mysqlDB = mysql.createConnection(db_config);
+}
+
+/****************************** frontend *********************************/
+
+if (process.env.NODE_ENV == 'production') {
+  app.use(express.static(path.join(__dirname, '../meetingnote/build')));
+
+  app.get('/main', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
+  });
+  app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
+  });
+  app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
+  });
+  app.get('/script', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
+  });
+}
+
+/****************************** Web server code *********************************/
 
 app.post('/check_login', function (req, res) {
   var id = req.body.user_id;
   var pw = req.body.user_pw;
   var sql = 'SELECT * FROM USER WHERE user_id=? and user_pw = SHA2(?, 224)';
-  mysqlDB.query(sql, [id,pw], function (err, results) {
+  mysqlDB.query(sql, [id, pw], function (err, results) {
     if (err) return res.send({ code: 11, msg: `${err}` });
 
     if (!results[0]) {
@@ -146,27 +269,27 @@ app.post('/meet_create', function (req, res) {
   mysqlDB.query(sql, [meet_name, meet_id, meet_date], function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else {
-      return res.send({ code: 0, msg: "request success"});
+      return res.send({ code: 0, msg: "request success", id: meet_id});
     }
   });
 });
 
 app.post('/meet_valid', function (req, res) {
-  var meet_name = req.body.meet_name;
-  var sql = 'SELECT * FROM MEET WHERE meet_name=?';
-  mysqlDB.query(sql, meet_name, function (err, results) {
+  var meet_id = req.body.meet_id;
+  var sql = 'SELECT * FROM MEET WHERE meet_id=?';
+  mysqlDB.query(sql, meet_id, function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else if (!results[0]) return res.send({ code: 31, msg: "meet fail: meet_name not exist"});
     else  {
-      sql = 'SELECT isfinish FROM MEET WHERE meet_name=?';
-      mysqlDB.query(sql, meet_name, function (err, results) {
+      sql = 'SELECT * FROM MEET WHERE meet_id=?';
+      mysqlDB.query(sql, meet_id, function (err, results) {
         if (err)  return res.send({ code: 11, msg: `${err}`});
         else {
           if (results[0].isfinish === 1) {
             return res.send({ code: 36, msg: "meet fail: invalid meet" });
           }
           else {
-            return res.send({ code: 0, msg: "request success" });
+            return res.send({ code: 0, msg: "request success", id: results[0].meet_id});
           }
         }
       })
@@ -175,7 +298,7 @@ app.post('/meet_valid', function (req, res) {
 });
 
 app.post('/meet_list', function (req, res) {
-  var sql = 'SELECT meet_name, meet_date FROM MEET ORDER BY meet_date DESC';
+  var sql = 'SELECT * FROM MEET ORDER BY meet_date DESC';
   mysqlDB.query(sql, function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else  return res.send({ code: 0, msg: "request success", lists: results});
@@ -183,9 +306,9 @@ app.post('/meet_list', function (req, res) {
 });
 
 app.post('/meet_delete', function (req, res) {
-  var meet_name = req.body.meet_name;
-  var sql = 'DELETE FROM MEET WHERE MEET_NAME=?';
-  mysqlDB.query(sql, meet_name, function (err, results) {
+  var meet_id = req.body.meet_id;
+  var sql = 'DELETE FROM MEET WHERE MEET_ID=?';
+  mysqlDB.query(sql, meet_id, function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else {
       res.send({ code: 0, msg: "request success"});
@@ -194,9 +317,9 @@ app.post('/meet_delete', function (req, res) {
 });
 
 app.post('/meet_open', function (req, res) {
-  var meet_name = req.body.meet_name;
-  var sql = 'SELECT * FROM MEET WHERE MEET_NAME=?';
-  mysqlDB.query(sql, meet_name, function (err, results) {
+  var meet_id = req.body.meet_id;
+  var sql = 'SELECT * FROM MEET WHERE MEET_ID=?';
+  mysqlDB.query(sql, meet_id, function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else {
       if(!results[0]) return res.send({ code: 37, msg: "meet script not exists" });
@@ -208,13 +331,29 @@ app.post('/meet_open', function (req, res) {
 });
 
 app.post('/meet_chat', function (req, res) {
-  var meet_name = req.body.meet_name;
-  var sql = 'SELECT meet_content FROM MEET WHERE MEET_NAME=?';
-  mysqlDB.query(sql, meet_name, function (err, results) {
+  var meet_id = req.body.meet_id;
+  var sql = 'SELECT meet_content FROM MEET WHERE MEET_ID=?';
+  mysqlDB.query(sql, meet_id, function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else {
       if(!results[0]) return res.send({ code: 37, msg: "meet script not exists"});
       else return res.send({ code: 0, msg: "request success", chat: results[0].meet_content});
+    }
+  })
+});
+
+app.post('/meet_info', function (req, res) {
+  var meet_id = req.body.meet_id;
+  var sql = 'SELECT * FROM MEET WHERE MEET_ID=?';
+  mysqlDB.query(sql, meet_id, function (err, results) {
+    if (err)  return res.send({ code: 11, msg: `${err}` });
+    else {
+      if(!results[0]) {
+        return res.send({ code: 31, msg: "meet fail: meet_id not exist" });
+      }
+      else {
+        return res.send({ code: 0, msg: "meet success", data: results[0] });
+      }
     }
   })
 });

@@ -54,6 +54,7 @@ export default function SignIn() {
       fetch("/check_login", requestOptions)
       .then(res => res.json())
       .then(result => {
+        console.log(result);
         if(result.code !== 0) alert("아이디 혹은 비밀번호가 틀렸습니다.");
         else {
           alert(`${result.user_name}님 환영합니다!`);

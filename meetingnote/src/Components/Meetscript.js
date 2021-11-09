@@ -37,7 +37,7 @@ export default function MeetScript(prop) {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type","application/json");
 
-    var raw = JSON.stringify({ "meet_name": prop.meet_name});
+    var raw = JSON.stringify({ "meet_id": prop.meet_id});
 
     var requestOptions = {
       method: "POST",
@@ -58,7 +58,7 @@ export default function MeetScript(prop) {
     <div className={classes.root}>
       <Paper elevation={3} className={classes.paper}>
         <Typography variant="h6" align="center">
-          <span style={{fontWeight: "bold", textDecoration: "underline overline", textDecorationColor: "#ffc31e"}}>Script</span>
+          <span style={{fontWeight: "bold", textDecoration: "underline overline", textDecorationColor: "#3f51b5"}}>Script</span>
         </Typography>
         <div className={classes.scriptContainer}>
           {list && list.map(data => (

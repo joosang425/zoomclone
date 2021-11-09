@@ -77,7 +77,7 @@ export default function Finished(prop) {
             redirect: "follow"  
         })
             .then(res => res.json())
-            .then(result => {                
+            .then(result => {
                 console.log(result)
                 if(result.code === 0) {
                     setList(result.lists);
@@ -93,11 +93,11 @@ export default function Finished(prop) {
         getList(prop);
       }, [prop]);
 
-    const handleClickScript =(meet_name) => {
+    const handleClickScript =(meet_id) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        var raw = JSON.stringify({ "meet_name": meet_name});
+        var raw = JSON.stringify({ "meet_id": meet_id});
 
         var requestOptions = {
             method: 'POST',
@@ -111,7 +111,7 @@ export default function Finished(prop) {
             .then(result => {
                 console.log(result)
                 if(result.code === 0) {
-                    window.location.href=`/script?meet_name=${meet_name}`;
+                    window.location.href=`/script?meet_id=${meet_id}`;
                 }
                 else if(result.code === 37){
                     alert("스크립트가 삭제되었거나, 유효하지 않은 스크립트입니다.");
@@ -120,11 +120,11 @@ export default function Finished(prop) {
             .catch(error => console.log('error', error))
     }
 
-    const handleDeleteIcon = (meet_name) => {
+    const handleDeleteIcon = (meet_id) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
     
-        var raw = JSON.stringify({ "meet_name": meet_name });
+        var raw = JSON.stringify({ "meet_id": meet_id });
     
         var requestOptions = {
             method: 'POST',
@@ -157,12 +157,12 @@ export default function Finished(prop) {
                         <ListItem key={data.meet_name} id='data' className={classes.data}>
                             <div style={{display:'block', width:"100%", margin:"2%"}}>
                                 <div className={classes.ScheduledName}>
-                                <DeleteForever onClick={()=> handleDeleteIcon(data.meet_name)} className={classes.deleteBtn} color="error"/>
+                                <DeleteForever onClick={()=> handleDeleteIcon(data.meet_id)} className={classes.deleteBtn} color="error"/>
                                 <span style={{fontWeight:"bold"}}>{data.meet_name}</span>
                                 </div>
                                 <Grid>
                                     <Chip className={classes.Chip} id="meet_date" label={data.meet_date}/>
-                                    <Chip className={classes.ScriptChip} id="script" onClick={() => handleClickScript(data.meet_name)} icon={<DescriptionIcon style={{ color: "white" }}/>} label="SCRIPT"/>
+                                    <Chip className={classes.ScriptChip} id="script" onClick={() => handleClickScript(data.meet_id)} icon={<DescriptionIcon style={{ color: "white" }}/>} label="SCRIPT"/>
                                 </Grid>
                             </div>
                         </ListItem>

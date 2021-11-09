@@ -1,4 +1,4 @@
-const socket = io('/');
+const socket = io();
 
 const peer = new Peer(USER_ID, { 
 });
@@ -247,7 +247,6 @@ function copyToClipboard(val) {
 }
 
 const linkShare = () => {
-  console.log(room_id);
   copyToClipboard(room_id);
   alert("회의 방 ID가 복사되었습니다.");
 }
