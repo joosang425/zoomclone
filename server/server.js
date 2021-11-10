@@ -188,9 +188,9 @@ if(process.env.NODE_ENV == 'production') {
     user: 'bbad6aa47dd3cf',
     password: 'b95a05e9',
     database: 'heroku_5ca53afc9e412f3'
-  }
+  };
 
-  mysqlDB = mysql.createPool(db_config)
+  mysqlDB = mysql.createPool(db_config);
 }
 
 else {
