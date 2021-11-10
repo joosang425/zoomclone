@@ -7,6 +7,7 @@ const mysql = require('mysql');
 const shortid = require('shortid');
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config();
 
 const { ExpressPeerServer } = require('peer');
 const peerServer = ExpressPeerServer(server, {
@@ -122,21 +123,32 @@ const redis = require('redis');
 const { Server } = require('http');
 var pub,sub
 
-pub = redis.createClient({
-  host:'localhost',
-  port: 6379,
-  db: 0
-})
-sub = redis.createClient({
-  host:'localhost',
-  port: 6379,
-  db: 0
-})
+if (process.env.NODE_ENV == 'production'){
+  pub = redis.createClient(process.env.REDIS_URL);
+  sub = redis.createClient(process.env.REDIS_URL);
+  sub.subscribe('server');
+  sub.on('subscribe',function(){
+    console.log("=== Redis 연결 ===");
+  }) 
+}
 
-sub.subscribe('server');
-sub.on('subscribe',function(){
-  console.log("=== Redis 연결 ===");
-})
+else {
+  pub = redis.createClient({
+    host:'localhost',
+    port: 6379,
+    db: 0
+  })
+  sub = redis.createClient({
+    host:'localhost',
+    port: 6379,
+    db: 0
+  })
+  
+  sub.subscribe('server');
+  sub.on('subscribe',function(){
+    console.log("=== Redis 연결 ===");
+  })
+}
 
 sub.on('message', function(channel, message){
   var msg = JSON.parse(message);
@@ -169,15 +181,50 @@ var inputDB = function(room){
 
 var mysqlDB;
 
-var db_config = {
-  host: 'localhost',
-  port: 3306,
-  user: 'joosang',
-  password: 'joosang25^',
-  database: 'mydb'
-};
+if(process.env.NODE_ENV == 'production') {
+  var db_config = {
+    host: 'us-cdbr-east-04.cleardb.com',
+    port: 3306,
+    user: 'bbad6aa47dd3cf',
+    password: 'b95a05e9',
+    database: 'heroku_5ca53afc9e412f3'
+  }
 
-mysqlDB = mysql.createConnection(db_config);
+  mysqlDB = mysql.createPool(db_config)
+}
+
+else {
+  var db_config = {
+    host: 'localhost',
+    port: 3306,
+    user: 'joosang',
+    password: 'joosang25^',
+    database: 'mydb'
+  };
+  
+  mysqlDB = mysql.createConnection(db_config);
+}
+
+/****************************** Frontend *********************************/
+
+if (process.env.NODE_ENV == 'production') {
+  app.use(express.static(path.join(__dirname, '../meetingnote/build')));
+
+  // 일반 페이지는 react 빌드 파일로 라우트
+  app.get('/main', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'));
+  });
+  app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'));
+  });
+  app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'));
+  });
+  app.get('/script', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'));
+  });
+
+}
 
 /****************************** Web server code *********************************/
 
