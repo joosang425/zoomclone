@@ -90,7 +90,7 @@ export default function SignUp() {
       alert("비밀번호에 가능한 특수문자는 ~!@^ 입니다.");
     }
     else if (checkPhone(user_phone)) {
-      alert("이메일 형식이 올바르지 않습니다.");
+      alert("휴대폰 입력 형식이 올바르지 않습니다.");
     }
     else if(user_pw !== user_pwcheck) {
       alert("비밀번호를 다시 확인해주시기 바랍니다.");
@@ -164,7 +164,6 @@ export default function SignUp() {
               label = "휴대폰 번호"
               value = {user_phone}
               onChange = {handlePhoneChange}
-              autoFocus
               size = "medium"
               onKeyPress = {onKeyPress}
               />
@@ -179,7 +178,6 @@ export default function SignUp() {
               label = "아이디"
               value = {user_id}
               onChange = {handleIdChange}
-              autoFocus
               size = "medium"
               onKeyPress = {onKeyPress}
               />
@@ -195,7 +193,6 @@ export default function SignUp() {
               type = "password"
               value = {user_pw}
               onChange = {handlePwChange}
-              autoFocus
               size = "medium"
               onKeyPress = {onKeyPress}
               />
@@ -211,7 +208,6 @@ export default function SignUp() {
               type = "password"
               value = {user_pwcheck}
               onChange = {handlePwCheckChange}
-              autoFocus
               size = "medium"
               onKeyPress = {onKeyPress}
               />
