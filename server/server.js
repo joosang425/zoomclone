@@ -122,32 +122,21 @@ const redis = require('redis');
 const { Server } = require('http');
 var pub,sub
 
-if (process.env.NODE_ENV == 'production') {
-  pub = redis.createClient(process.env.REDIS_URL);
-  sub = redis.createClient(process.env.REDIS_URL);
-  sub.subscribe('server');
-  sub.on('subscribe', function() {
-    console.log("=== Redis 연결 ===");
-  })
-}
+pub = redis.createClient({
+  host:'localhost',
+  port: 6379,
+  db: 0
+})
+sub = redis.createClient({
+  host:'localhost',
+  port: 6379,
+  db: 0
+})
 
-else {
-  pub = redis.createClient({
-    host:'localhost',
-    port: 6379,
-    db: 0
-  })
-  sub = redis.createClient({
-    host:'localhost',
-    port: 6379,
-    db: 0
-  })
-  
-  sub.subscribe('server');
-  sub.on('subscribe',function(){
-    console.log("=== Redis 연결 ===");
-  })
-}
+sub.subscribe('server');
+sub.on('subscribe',function(){
+  console.log("=== Redis 연결 ===");
+})
 
 sub.on('message', function(channel, message){
   var msg = JSON.parse(message);
@@ -180,48 +169,15 @@ var inputDB = function(room){
 
 var mysqlDB;
 
-if (process.env.NODE_ENV == 'production') {
-  var db_config = {
-    host: 'us-cdbr-east-04.cleardb.com',
-    port: 3306,
-    user: 'bbad6aa47dd3cf',
-    password: 'b95a05e9',
-    database: 'heroku_5ca53afc9e412f3'
-  };
+var db_config = {
+  host: 'localhost',
+  port: 3306,
+  user: 'joosang',
+  password: 'joosang25^',
+  database: 'mydb'
+};
 
-  mysqlDB = mysql.createPool(db_config)
-}
-
-else {
-  var db_config = {
-    host: 'localhost',
-    port: 3306,
-    user: 'joosang',
-    password: 'joosang25^',
-    database: 'mydb'
-  };
-  
-  mysqlDB = mysql.createConnection(db_config);
-}
-
-/****************************** frontend *********************************/
-
-if (process.env.NODE_ENV == 'production') {
-  app.use(express.static(path.join(__dirname, '../meetingnote/build')));
-
-  app.get('/main', (req, res) => {
-    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
-  });
-  app.get('/home', (req, res) => {
-    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
-  });
-  app.get('/signup', (req, res) => {
-    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
-  });
-  app.get('/script', (req, res) => {
-    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'))
-  });
-}
+mysqlDB = mysql.createConnection(db_config);
 
 /****************************** Web server code *********************************/
 
