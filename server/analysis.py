@@ -1,73 +1,57 @@
-# -*- coding: utf-8 -*- 
 import imp
+import sys
 import io
-from re import split
-from krwordrank import sentence
-from kss.kss import split_sentences
 import redis
-import shortuuid
-import os
 import json
-import sys 
+import os
 
-import  kss
+import shortuuid
+from wordcloud import WordCloud
 from collections import Counter
 
-#형태소분석기 Mecab
-
-from wordcloud import WordCloud
-
-#KRWordRank
 from krwordrank.sentence import summarize_with_sentences
 from krwordrank.word import KRWordRank
-
-#graph
-import matplotlib.pyplot as plt
-from matplotlib import font_manager,rc
-import matplotlib.cm as cm #colormap
-#tqdm
-from tqdm import tqdm
-
+from kss import split_sentences
 from threading import Thread
 
-
-
-sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding='utf-8')
 
 env = os.environ.get("PYTHON_ENV")
 tgtdir = ''
-
-if env == "production":
-    import mecab
+if env == 'production': 
+    import mecab 
     mecab = mecab.MeCab()
     tgtdir = '../meetingnote/build/uploads/'
-
+    
 else:
     from eunjeon import Mecab
     mecab = Mecab()
     tgtdir = '../meetingnote/public/uploads/'
     
-#wordcloud 시각화
-from eunjeon import Mecab
-def visualize(content): 
+def visualize(contents):
+    nouns = mecab.nouns(contents)
+    count = Counter(nouns)
+    
+    remove_char_counter = Counter(
+        {x: count[x] for x in count if len(x) >= 2})
+    
+    noun_list = remove_char_counter.most_common(100)
+    
     filename = shortuuid.uuid()
-    N  = [] #명사 배열
-    pos = mecab.pos(content)
-
-    for word in tqdm(pos):
-        if word[1] in ['NNG','NNP','XR']:
-            if len(word[0])>1 : 
-                N.append(word[0])
-    p1 = WordCloud(font_path='../NanumSquareR.ttf',max_font_size=180,
-                background_color='white', width=1200, height=800, colormap=cm.tab20
-               ).generate_from_frequencies(dict(Counter(N).most_common(50))) #frequency기준 상위 50개
-    p1.to_file('%s%s.png' % (tgtdir, filename))
+    wc = WordCloud(font_path='../NanumSquareR.ttf', 
+                   background_color="white",
+                   width=1000,
+                   height=1000,
+                   max_words=100,
+                   max_font_size=300)
+    
+    wc.generate_from_frequencies(dict(noun_list))
+    wc.to_file('%s%s.png' % (tgtdir, filename))
     data = '%s%s.png' % ("/uploads/", filename)
     result = {'type': 'wordcloud', 'data': data}
     r.publish('server', json.dumps(result, ensure_ascii=False))
-
-#wordcloud 시각화
+    
 def summarize(content):
     try:
         penalty = lambda x:0 if (25 <= len(x)) else 1 #길이가 25부터 80글자인 문장 선호
@@ -82,10 +66,14 @@ def summarize(content):
         result = {'type':'summary','data':'요약할 대화가 충분하지 않습니다.'}
         r.publish('server',json.dumps(result,ensure_ascii=False))
 
-r = redis.StrictRedis(host="localhost",port=6379,db=0)
-
+if env == "produnction":
+    r = redis.from_url(os.environ.get("REDIS_URL"))
+else:
+    r = redis.StrictRedis(host="localhost", port=6379, db=0)
+    
 sub = r.pubsub()
 sub.subscribe('analysis_channel')
+
 while True:
     message = sub.get_message()
 
@@ -96,7 +84,7 @@ while True:
             data = json.loads(data)
 
             contents = data['contents'].replace(","," ")
-            sentence = kss.split_sentences(contents)
+            sentence = split_sentences(contents)
             
             roomId = data['room']
 
@@ -111,5 +99,3 @@ while True:
             th2.join()
 
             r.publish('server', json.dumps({"type": "finish", "room": roomId}, ensure_ascii=False))
-
-
