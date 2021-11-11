@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*- 
+import imp
 import io
 from re import split
 from krwordrank import sentence
@@ -34,28 +35,24 @@ from threading import Thread
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
-#matplotlib 한글 font
-#font_path = '../NanumSquareR.ttf'
-#font = font_manager.FontProperties(fname=font_path).get_name()
-#rc('font', family=font)
-#matplotlib 한글 font
+env = os.environ.get("PYTHON_ENV")
+tgtdir = ''
 
-# env = os.environ.get('PYTHON_ENV')
-# if env == "production":
-#     from konlpy.tag import Mecab
-#     mecab = Mecab(dicpath=r"C:\mecab\mecab-ko-dic")
-# else:
-#     from eunjeon import Mecab
-#     mecab = Mecab()
+if env == "production":
+    import mecab
+    mecab = mecab.MeCab()
+    tgtdir = '../meetingnote/build/uploads/'
 
-
+else:
+    from eunjeon import Mecab
+    mecab = Mecab()
+    tgtdir = '../meetingnote/public/uploads'
+    
 #wordcloud 시각화
 from eunjeon import Mecab
 def visualize(content): 
     filename = shortuuid.uuid()
-    tgtdir = "../meetingnote/public/uploads/"
     N  = [] #명사 배열
-    mecab = Mecab()
     pos = mecab.pos(content)
 
     for word in tqdm(pos):
