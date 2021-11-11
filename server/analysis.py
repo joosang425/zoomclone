@@ -46,7 +46,7 @@ if env == "production":
 else:
     from eunjeon import Mecab
     mecab = Mecab()
-    tgtdir = '../meetingnote/public/uploads'
+    tgtdir = '../meetingnote/public/uploads/'
     
 #wordcloud 시각화
 from eunjeon import Mecab
