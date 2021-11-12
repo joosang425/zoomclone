@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*- 
-import imp
 import io
 from re import split
-from krwordrank import sentence
-from kss.kss import split_sentences
+import kss
 import redis
 import shortuuid
-import os
 import json
 import sys 
+import os
 
-import  kss
 from collections import Counter
 
 #형태소분석기 Mecab
@@ -25,8 +22,7 @@ from krwordrank.word import KRWordRank
 import matplotlib.pyplot as plt
 from matplotlib import font_manager,rc
 import matplotlib.cm as cm #colormap
-#tqdm
-from tqdm import tqdm
+
 
 from threading import Thread
 
@@ -35,27 +31,32 @@ from threading import Thread
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
+#matplotlib 한글 font
+font_path = '../NanumSquareR.ttf'
+font = font_manager.FontProperties(fname=font_path).get_name()
+rc('font', family=font)
+#matplotlib 한글 font
+
 env = os.environ.get("PYTHON_ENV")
 tgtdir = ''
-
 if env == "production":
     import mecab
     mecab = mecab.MeCab()
     tgtdir = '../meetingnote/build/uploads/'
 
 else:
-    from eunjeon import Mecab
-    mecab = Mecab()
+    from konlpy.tag import Mecab
+    mecab = Mecab(dicpath=r"C:\mecab\mecab-ko-dic")
     tgtdir = '../meetingnote/public/uploads/'
-    
+
+
 #wordcloud 시각화
-from eunjeon import Mecab
 def visualize(content): 
     filename = shortuuid.uuid()
     N  = [] #명사 배열
     pos = mecab.pos(content)
 
-    for word in tqdm(pos):
+    for word in pos:
         if word[1] in ['NNG','NNP','XR']:
             if len(word[0])>1 : 
                 N.append(word[0])
@@ -114,5 +115,3 @@ while True:
             th2.join()
 
             r.publish('server', json.dumps({"type": "finish", "room": roomId}, ensure_ascii=False))
-
-
