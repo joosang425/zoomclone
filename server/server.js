@@ -15,7 +15,6 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 app.use('/peerjs', peerServer);
-
 app.use(bodyParser.json());
 
 function getToday() {
@@ -24,11 +23,26 @@ function getToday() {
   var year = today.getFullYear();
   var month = today.getMonth() + 1
   var day = today.getDate();
-  var hour = today.getHours();
-  var min = today.getMinutes();
 
-  var temp = year + "/" + month + "/" + day + "/" + hour + "/" + min;
+  var temp = year + "/" + month + "/" + day;
   return temp;
+}
+
+function checkTime(i) {
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
+}
+
+function getTime(){
+  var today = new Date();
+  var h = today.getHours();
+  var m = today.getMinutes();
+  // add a zero in front of numbers<10
+  m = checkTime(m);
+  var time = h + ":" + m;
+  return time;
 }
 
 /******************************Video *********************************/
@@ -268,9 +282,10 @@ app.post('/meet_create', function (req, res) {
   var meet_name = req.body.meet_name;
   var meet_id = shortid.generate();
   var meet_date = getToday(); 
+  var meet_time = getTime();
 
-  var sql = 'INSERT INTO MEET VALUE(?,?,?,"","","",0)';
-  mysqlDB.query(sql, [meet_name, meet_id, meet_date], function (err, results) {
+  var sql = 'INSERT INTO MEET VALUE(?,?,?,"","","",?,0)';
+  mysqlDB.query(sql, [meet_name, meet_id, meet_date, meet_time], function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else {
       return res.send({ code: 0, msg: "request success", id: meet_id});
@@ -304,7 +319,7 @@ app.post('/meet_valid', function (req, res) {
 
 //  끝난 회의 목록
 app.post('/meet_list', function (req, res) {
-  var sql = 'SELECT * FROM MEET ORDER BY meet_date DESC';
+  var sql = 'SELECT * FROM MEET ORDER BY meet_date DESC, meet_time DESC';
   mysqlDB.query(sql, function (err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else  return res.send({ code: 0, msg: "request success", lists: results});
