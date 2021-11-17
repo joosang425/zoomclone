@@ -26,8 +26,6 @@ import matplotlib.cm as cm #colormap
 
 from threading import Thread
 
-
-
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
 
@@ -115,3 +113,5 @@ while True:
             th2.join()
 
             r.publish('server', json.dumps({"type": "finish", "room": roomId}, ensure_ascii=False))
+
+

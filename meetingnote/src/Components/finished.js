@@ -161,7 +161,7 @@ export default function Finished(prop) {
                                 <span style={{fontWeight:"bold"}}>{data.meet_name}</span>
                                 </div>
                                 <Grid>
-                                    <Chip className={classes.Chip} id="meet_date" label={data.meet_date}/>
+                                    <Chip className={classes.Chip} id="meet_date" label={data.meet_date}  style={ {color: "#ffffff"}}/>
                                     <Chip className={classes.ScriptChip} id="script" onClick={() => handleClickScript(data.meet_id)} icon={<DescriptionIcon style={{ color: "white" }}/>} label="SCRIPT"/>
                                 </Grid>
                             </div>

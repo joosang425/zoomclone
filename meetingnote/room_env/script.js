@@ -7,6 +7,8 @@ const peers = {};
 
 let room_id, user_id, user_name;
 
+// peer 서버와 정상적으로 통신이 되면 'open' event 발생
+// 'open' event 발생하면 'joinRoom' event emit
 peer.on('open', peerid => {
   room_id = ROOM_ID;
   user_id = USER_ID;
@@ -24,14 +26,15 @@ socket.on('connect', function() {
 
 const videoGrid = document.getElementById('video-grid');
 
+// 내 비디오 요소들
 const myVideoBx = document.createElement('div');
 const myNameTag = document.createElement('div');
 const myVideo = document.createElement('video');
-/*const chatlist = document.querySelector(".chatting-list");*/
 myVideo.muted = true;
 
 let myVideoStream;
 let currentPeer;
+
 // 유저의 브라우저로부터 Media Device들을 받아오는 과정
 navigator.mediaDevices
   .getUserMedia({
@@ -41,44 +44,42 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream
     user_name = USER_NAME
+    // 내 stream을 브라우저에 추가
     addVideoStream(myVideoBx, myNameTag, myVideo, user_name, stream);
 
+    // caller의 call에 대한 응답
     peer.on('call', call => {
       call.answer(stream);
       const callerVideoBx = document.createElement('div');
       const callerNameTag = document.createElement('div');
-      const video = document.createElement('video');
+      const callervideo = document.createElement('video');
       var callerName = call.metadata.callerName;
       call.on('stream', (userVideoStream) => {
-        addVideoStream(callerVideoBx, callerNameTag, video, callerName, userVideoStream);
+        addVideoStream(callerVideoBx, callerNameTag, callervideo, callerName, userVideoStream);
         currentPeer = call.peerConnection
       });
     });
 
+    // 새로운 유저가 접속하면 서버로부터 그 유저의 userID를 받아온 후 연결
     socket.on('userConnected', data => {
-      connectToNewUser(data.id, data.name, stream);
+      setTimeout(() => {connectToNewUser(data.id, data.name, stream)}, 2000)
     });
 });
-
-/*socket.on('message', data => {
-  const li = document.createElement("li");
-  li.innerHTML = `${data.message} - ${data.time}`
-  chatlist.appendChild(li);
-})*/
 
 function connectToNewUser(userId, calleeName, stream) {
   const call = peer.call(userId, stream, {metadata: {callerName: USER_NAME}});
   const calleeVideoBx = document.createElement('div');
   const calleeNameTag = document.createElement('div');
-  const video = document.createElement('video');
+  const calleevideo = document.createElement('video');
 
+  // callee가 응답하면
   call.on('stream', (userVideoStream) => {
-    addVideoStream(calleeVideoBx, calleeNameTag, video, calleeName, userVideoStream);
+    addVideoStream(calleeVideoBx, calleeNameTag, calleevideo, calleeName, userVideoStream);
     currentPeer = call.peerConnection
   });
 
   call.on('close', () => {
-    removeVideoStream(video, stream);
+    removeVideoStream(calleevideo, stream);
   });
 
   peers[userId] = call;
@@ -161,7 +162,7 @@ socket.on('updateChat', (data) => {
   var className = ''
 
   if(data.type == "system") {
-    var node = document.createTextNode(`${data.name}  ${data.message}`)
+    var node = document.createTextNode(`${data.name} ${data.message}`)
     bold.appendChild(node)
     msg.appendChild(bold)
   }
@@ -197,6 +198,40 @@ socket.on('updateChat', (data) => {
 
 const scrollToBottom = () => {
   $('#chat').scrollTop($('#chat').prop("scrollHeight"));
+}
+
+/************************************ 사용자 목록 ************************************/
+
+socket.on('updateMembers', (data) => {
+  var members = document.getElementById('memberList');
+
+  while(members.hasChildNodes()) {
+    members.removeChild(members.firstChild)
+  }
+
+  for(var i = 0; i < data.num; i++) {
+    var node = document.createTextNode(`${data.members[i]}`)
+    var member = document.createElement('a')
+    member.appendChild(node)
+    members.appendChild(member)
+  }
+})
+
+function memberList() {
+  document.getElementById('memberList').classList.toggle("show")
+}
+
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown__content")
+      var i
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i]
+        if (openDropdown.classList.contains('show')) {
+           openDropdown.classList.remove('show')
+        }
+     }
+  }
 }
 
 /************************************ 버튼 기능 함수들 ************************************/

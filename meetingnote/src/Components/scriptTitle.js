@@ -90,10 +90,10 @@ export default function ScriptTitle(prop) {
             <ArrowBackIcon/>&nbsp;Back
         </Button>
         <div className={classes.leftBtn}>
+            <span style={{color: "#ffffff", fontWeight: "bold", maxWidth: "100%", marginRight:"1%" }}>{sessionStorage.getItem("user_name")}님</span>
             <Button style={{margin:"1%"}} onClick={handleClickLogout} color="primary" variant="contained">
                 <LogoutIcon/>&nbsp;LOGOUT
             </Button>
-            <span style={{color: "#ffffff", fontWeight: "bold", maxWidth: "100%", marginRight:"1%" }}>{sessionStorage.getItem("user_name")}님</span>
         </div>
     </div>
       <div className={classes.root}>
@@ -103,7 +103,7 @@ export default function ScriptTitle(prop) {
             </Typography>
         </Grid>
         <Grid className={classes.grid}>
-            <Chip className={classes.Chip} id="meet_date" icon={<EventIcon/>} label={data.meet_date} />
+            <Chip className={classes.Chip} id="meet_date" icon={<EventIcon style={{color: "white" }}/>} label={data.meet_date} style={ {color: "#ffffff"}}/>
         </Grid>
       </div>
     </div>     

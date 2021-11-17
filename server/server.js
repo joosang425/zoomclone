@@ -24,8 +24,10 @@ function getToday() {
   var year = today.getFullYear();
   var month = today.getMonth() + 1
   var day = today.getDate();
+  var hour = today.getHours();
+  var min = today.getMinutes();
 
-  var temp = year + "/" + month + "/" + day;
+  var temp = year + "/" + month + "/" + day + "/" + hour + "/" + min;
   return temp;
 }
 
@@ -55,12 +57,10 @@ io.on('connection', socket => {
       rooms[room].num = rooms[room].members.length
       rooms[room].chatArray = [] 
       rooms[room].contentArray = [] 
-      rooms[room].chatDict = {} 
     }
 
     rooms[room].members.push(name)
     rooms[room].num = rooms[room].members.length
-    rooms[room].chatDict[id] = ''
     
     socket.join(room)
     socket.to(room).broadcast.emit('userConnected', { id: id, name: name }) 
@@ -79,7 +79,6 @@ io.on('connection', socket => {
       chat = `${name}: ${data.message}`;
       rooms[room].contentArray.push(data.message);
       rooms[room].chatArray.push(chat);
-      rooms[room].chatDict[id] += data.message
 
       socket.to(room).broadcast.emit('updateChat', data)
     }
@@ -112,8 +111,9 @@ io.on('connection', socket => {
     }
     else{
       socket.to(room).broadcast.emit('userDisconnected', id)
+      io.to(room).emit('updateChat', { type: 'system', name: '[SYSTEM]', message: name + '님 퇴장'})
+      io.to(room).emit('updateMembers', { num: rooms[room].num, members: rooms[room].members})
     }
-   
   })
 })
 
@@ -228,6 +228,7 @@ if (process.env.NODE_ENV == 'production') {
 
 /****************************** Web server code *********************************/
 
+//  회원 확인 후 로그인 
 app.post('/check_login', function (req, res) {
   var id = req.body.user_id;
   var pw = req.body.user_pw;
@@ -246,6 +247,7 @@ app.post('/check_login', function (req, res) {
 }
 );
 
+//  회원 등록
 app.post('/registration', function (req, res) {
   var id = req.body.user_id;
   var pw = req.body.user_pw;
@@ -261,6 +263,7 @@ app.post('/registration', function (req, res) {
   });
 });
 
+// 회의 만들기
 app.post('/meet_create', function (req, res) {
   var meet_name = req.body.meet_name;
   var meet_id = shortid.generate();
@@ -275,6 +278,7 @@ app.post('/meet_create', function (req, res) {
   });
 });
 
+// 회의방 입장 전 유효한 회의방 인지 확인
 app.post('/meet_valid', function (req, res) {
   var meet_id = req.body.meet_id;
   var sql = 'SELECT * FROM MEET WHERE meet_id=?';
@@ -298,6 +302,7 @@ app.post('/meet_valid', function (req, res) {
   })
 });
 
+//  끝난 회의 목록
 app.post('/meet_list', function (req, res) {
   var sql = 'SELECT * FROM MEET ORDER BY meet_date DESC';
   mysqlDB.query(sql, function (err, results) {
@@ -306,17 +311,32 @@ app.post('/meet_list', function (req, res) {
   })
 });
 
+//  끝난 회의 삭제
 app.post('/meet_delete', function (req, res) {
   var meet_id = req.body.meet_id;
-  var sql = 'DELETE FROM MEET WHERE MEET_ID=?';
-  mysqlDB.query(sql, meet_id, function (err, results) {
+  var sql = 'SELECT * FROM MEET WHERE MEET_ID=?';
+  mysqlDB.query(sql, meet_id, function(err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else {
-      res.send({ code: 0, msg: "request success"});
+      var wc = results[0].wordcloud;
+      if (wc != null || wc === "") {
+        var filename = wc.substring(9, wc.length);
+        fs.unlink(img_folder + filename, function(err) {
+          if (err)  console.log('파일 삭제 에러:' + err);
+        })
+      }
+      sql = 'DELETE FROM MEET WHERE MEET_ID=?';
+      mysqlDB.query(sql, meet_id, function (err, results2) {
+        if (err)  return res.send({ code: 11, msg: `${err}`});
+        else {
+          res.send({ code: 0, msg: "request success"})
+        }
+      })
     }
   })
 });
 
+//  끝난 회의 스크립트 확인
 app.post('/meet_open', function (req, res) {
   var meet_id = req.body.meet_id;
   var sql = 'SELECT * FROM MEET WHERE MEET_ID=?';
@@ -331,6 +351,7 @@ app.post('/meet_open', function (req, res) {
   })
 });
 
+//  끝난 회의 채팅 출력
 app.post('/meet_chat', function (req, res) {
   var meet_id = req.body.meet_id;
   var sql = 'SELECT meet_content FROM MEET WHERE MEET_ID=?';
@@ -343,6 +364,7 @@ app.post('/meet_chat', function (req, res) {
   })
 });
 
+//  끝난 회의 정보 출력
 app.post('/meet_info', function (req, res) {
   var meet_id = req.body.meet_id;
   var sql = 'SELECT * FROM MEET WHERE MEET_ID=?';

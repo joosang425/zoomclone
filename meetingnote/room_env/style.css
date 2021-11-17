@@ -138,7 +138,7 @@
   .other {
     width: 90%;
     margin: auto;
-    color: white;
+    color: black;
     margin-top: 10px;
   }
   
@@ -184,7 +184,7 @@
   .dropdown__content {
     display: none;
     position: absolute;
-    background-color: white;
+    background-color: #ff9999;
     min-width: 100px;
     overflow: auto;
   }
