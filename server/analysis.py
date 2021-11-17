@@ -40,7 +40,7 @@ tgtdir = ''
 if env == "production":
     import mecab
     mecab = mecab.MeCab()
-    tgtdir = '../meetingnote/build/uploads/'
+    tgtdir = './meetingnote/build/uploads/'
 
 else:
     from konlpy.tag import Mecab
