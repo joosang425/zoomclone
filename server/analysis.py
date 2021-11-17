@@ -40,12 +40,12 @@ tgtdir = ''
 if env == "production":
     import mecab
     mecab = mecab.MeCab()
-    tgtdir = 'meetingnote/build/uploads/'
+    tgtdir = '../meetingnote/build/uploads/'
 
 else:
     from konlpy.tag import Mecab
     mecab = Mecab(dicpath=r"C:\mecab\mecab-ko-dic")
-    tgtdir = 'meetingnote/public/uploads/'
+    tgtdir = '../meetingnote/public/uploads/'
 
 
 #wordcloud 시각화

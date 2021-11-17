@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "concurrently \"cd server && node server.js\" \"cd server && PYTHON_ENV=production python analysis.py\"",
-    "heroku-postbuild": "cd meetingnote && npm install && npm run build",
+    "heroku-postbuild": "cd meetingnote && npm run build",
     "build": "cd meetingnote && react-scripts build",
     "test": "cd meetingnote && react-scripts test",
     "eject": "cd meetingnote && react-scripts eject",
@@ -13,7 +13,7 @@
     "dev:python": "cd server && python analysis.py",
     "dev:flaskServer": "cd server && set FLASK_ENV=development && python app.py",
     "dev:server": "cd server && nodemon server.js",
-    "dev:meetingnote": "cd meetingnote && react-scripts start && npm start"
+    "dev:meetingnote": "cd meetingnote && react-scripts start && yarn start"
   },
   "keywords": [],
   "author": "",
