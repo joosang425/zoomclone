@@ -318,13 +318,13 @@ app.post('/meet_delete', function (req, res) {
   mysqlDB.query(sql, meet_id, function(err, results) {
     if (err)  return res.send({ code: 11, msg: `${err}`});
     else {
-      var wc = results[0].wordcloud;
+     /* var wc = results[0].wordcloud;
       if (wc != null || wc === "") {
         var filename = wc.substring(9, wc.length);
         fs.unlink(img_folder + filename, function(err) {
           if (err)  console.log('파일 삭제 에러:' + err);
         })
-      }
+      }*/
       sql = 'DELETE FROM MEET WHERE MEET_ID=?';
       mysqlDB.query(sql, meet_id, function (err, results2) {
         if (err)  return res.send({ code: 11, msg: `${err}`});
