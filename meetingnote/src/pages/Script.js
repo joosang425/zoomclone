@@ -4,6 +4,7 @@ import MeetScript from "../Components/Meetscript";
 import Summary from "../Components/summary";
 import ScriptTitle from "../Components/scriptTitle";
 
+
 const useStyles = makeStyles((theme) => ({
   listTitle: {
     paddingTop: "4%",
@@ -31,8 +32,8 @@ export default function Script() {
       <div style={{width: "100%", height:"90%"}}>
             <div className={classes.body}>
               < ScriptTitle meet_id={meet_id} />
-              <div style={{ display: "flex", height: "88%", width: "95%", justifyContent:"center"}}>
-                <div style={{ height: "88%", width: "98%", justifyContent:"center"}}>
+              <div style={{ display: "flex", height: "85%", width: "95%", justifyContent:"center"}}>
+                <div style={{ height: "88%", width: "98%", justifyContent:"center",marginTop:"20px"}}>
                   < Summary meet_id={meet_id} />  
                 </div>
                 < MeetScript meet_id={meet_id} />

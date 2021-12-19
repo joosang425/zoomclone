@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, BrowserRouter } from 'react-router-dom';
-import { Home, Signup, Main, Script } from './pages';
+import { Home, Signup, Main, Script, pw_change,find_pw } from './pages';
 import './App.css';
 
 class App extends Component {
@@ -14,6 +14,8 @@ class App extends Component {
             <Route path = '/Signup' component={Signup}/>
             <Route path = '/Main' component={Main}/>
             <Route path = '/Script' component={Script}/>
+            <Route path = '/find_pw' component={find_pw}/>
+            <Route path = '/pw_change' component={pw_change}/>
           </BrowserRouter>
         </div>
       </Router>

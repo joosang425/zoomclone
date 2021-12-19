@@ -9,23 +9,35 @@ import  Button  from '@material-ui/core/Button';
 import  Link  from '@material-ui/core/Link';
 
 const useStyles = makeStyles((theme) => ({
+  header:{
+    minWidth: 1000,
+    backgroundColor: "#000000",
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center"
+
+  },
   paper: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
   form: {
-    width: '100%',
+    width: '60%',
     marginTop: theme.spacing(1),
   },
   submit: {
     marginTop: '3%',
-    marginBottom: '3%',
+    marginBottom: '5%',
+    backgroundColor:"#50bcdf",
+    width: "100%",
+    height: "36px",
   },
   logo: {
-    marginTop: '25%',
-    marginBottom: '10%',
-    height: '30%',
+    marginTop: '10%',
+    marginBottom: '0%',
+    height: '40%',
   },
 }));
 
@@ -54,7 +66,6 @@ export default function SignIn() {
       fetch("/check_login", requestOptions)
       .then(res => res.json())
       .then(result => {
-        console.log(result);
         if(result.code !== 0) alert("아이디 혹은 비밀번호가 틀렸습니다.");
         else {
           alert(`${result.user_name}님 환영합니다!`);
@@ -75,18 +86,18 @@ export default function SignIn() {
   }
 
   return(
-    <Container component="main" style={ { width: 400, height: window.innerHeight }}>
+    <Container component="main" style={ { width: 600, height: window.innerHeight,paddingTop:"1%" }}>
       <CssBaseline />
       <img src = { logo } className = { classes.logo } alt = 'logo'/>
       <div className = { classes.paper }>
         <Typography component = "h1" variant = "h6">
-          WELCOME TO MEETINGNOTE
+          THIS IS MEETINGNOTE<br></br>WELCOME HERE!
         </Typography>
         <form className = { classes.form } noValidate>
           <TextField
           variant = "standard"
           margin = "normal"
-          label = "아이디 입력"
+          label = "아이디"
           required
           fullWidth
           name = "id"
@@ -102,7 +113,7 @@ export default function SignIn() {
           required
           fullWidth
           name = "password"
-          label = "비밀번호 입력"
+          label = "비밀번호"
           type = "password"
           value = { pw }
           size = "medium"
@@ -119,8 +130,12 @@ export default function SignIn() {
             LOGIN
           </Button>
           <br/>
-          <Link href = "/Signup" variant = "body2" color = "primary">
+          <Link href = "/Signup" variant = "body2" style={ {display:"inline-block",marginRight: "14px", fontWeight: "bold", color:"#676565"} } >
             {"회원가입"}
+          </Link>
+          &nbsp;&nbsp;
+          <Link href = "/find_pw" variant = "body2" style={ {display:"inline-block",marginRight: "14px", fontWeight: "bold",color:"#676565"}}>
+            {"비밀번호 재설정"}
           </Link>
         </form>
       </div>

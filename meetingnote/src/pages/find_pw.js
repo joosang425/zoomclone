@@ -6,8 +6,9 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import logo from '../Icons/meetingnote_logo.png';
-import  Typography  from '@material-ui/core/Typography';
 import  Link  from '@material-ui/core/Link';
+import  Typography  from '@material-ui/core/Typography';  
+//import './Home.css';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -39,13 +40,6 @@ function checkId(userId) {
   return false;
 }
 
-function checkPw(userPw) {
-  var pwReg = /[#$%&*()_+|<>?:{}]/;
-  if(pwReg.test(userPw))
-    return true;
-  
-  return false;
-}
 
 function checkPhone(userphone) {
   var phReg = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
@@ -55,53 +49,35 @@ function checkPhone(userphone) {
   return false;
 }
 
-export default function SignUp() {
+export default function Find_pw() {
   const classes = useStyles();
   const [user_id, setUserId] = useState('');
-  const [user_pw, setUserPw] = useState('');
-  const [user_name, setUserName] = useState('');
   const [user_phone, setUserPhone] = useState('');
-  const [user_pwcheck, setUserPwcheck] = useState('');
 
   const handleIdChange = (e) => {
     setUserId(e.target.value);
   }
-  const handlePwChange = (e) => {
-    setUserPw(e.target.value);
-  }
-  const handleNameChange = (e) => {
-    setUserName(e.target.value);
-  }
+  
   const handlePhoneChange = (e) => {
     setUserPhone(e.target.value);
   }
-  const handlePwCheckChange = (e) => {
-    setUserPwcheck(e.target.value);
-  }
+  
   const handleSubmit = () => {
-    if (user_id === '' || user_phone === '' || user_name === '' || user_pw === '' || user_pwcheck === ''){
+    if (user_id === '' || user_phone === ''){
       alert("모든 정보를 입력해주세요.");
     }
     else if (checkId(user_id)) {
       alert("아이디는 영문자로 시작하는 6~20자 영문자 또는 숫자이어야 합니다.");
     }
-    else if (user_pw.length < 8) {
-      alert("비밀번호는 8자리 이상으로 설정해주세요.");
-    }
-    else if (checkPw(user_pw)) {
-      alert("비밀번호에 가능한 특수문자는 ~!@^ 입니다.");
-    }
+    
     else if (checkPhone(user_phone)) {
-      alert("이메일 형식이 올바르지 않습니다.");
-    }
-    else if(user_pw !== user_pwcheck) {
-      alert("비밀번호를 다시 확인해주시기 바랍니다.");
+      alert("전화번호 형식이 올바르지 않습니다.");
     }
     else {
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
-      var raw = JSON.stringify({ "user_id": user_id, "user_pw": user_pw, "user_name": user_name, "user_phone": user_phone});
+      var raw = JSON.stringify({ "user_id": user_id, "user_phone": user_phone });
 
       var requestOptions = {
         method: "POST",
@@ -110,13 +86,13 @@ export default function SignUp() {
         redirect: "follow"
       };
 
-      fetch("/registration", requestOptions)
+      fetch("/find", requestOptions)
       .then(response => response.json())
       .then(result => {
         console.log(result);
         if(result.code === 0) {
-          alert("회원가입 성공");
-          window.location.href = "/";
+          alert("회원정보와 일치하였습니다. 비밀번호를 재설정 해주세요.");  
+          window.location.href = "/pw_change";
         }
         else if(result.code === 3) {
           alert("이미 존재하는 아이디입니다.");
@@ -140,20 +116,20 @@ export default function SignUp() {
       </a>
       <div className = {classes.paper}>
       <Typography component = "h1" variant = "h6">
-          회원가입
+          CHECK PASSWORD
         </Typography>
         <form className = {classes.form} noValidate>
           <Grid container spacing = {2}>
             <Grid item xs = {12}>
               <TextField
-              name = "name"
+              name = "id"
               variant = "standard"
               required
               fullWidth
-              id = "name"
-              label = "이름"
-              value = {user_name}
-              onChange = {handleNameChange}
+              id = "id"
+              label = "아이디"  
+              value = {user_id}
+              onChange = {handleIdChange}
               autoFocus
               size = "medium"
               onKeyPress = {onKeyPress}
@@ -166,53 +142,10 @@ export default function SignUp() {
               required
               fullWidth
               id = "phone"
-              label = "휴대폰 번호"
+              label = "전화번호"
               value = {user_phone}
               onChange = {handlePhoneChange}
-              size = "medium"
-              onKeyPress = {onKeyPress}
-              />
-            </Grid>
-            <Grid item xs = {12}>
-              <TextField
-              name = "id"
-              variant = "standard"
-              required
-              fullWidth
-              id = "id"
-              label = "아이디"
-              value = {user_id}
-              onChange = {handleIdChange}
-              size = "medium"
-              onKeyPress = {onKeyPress}
-              />
-            </Grid>
-            <Grid item xs = {12}>
-              <TextField
-              name = "password"
-              variant = "standard"
-              required
-              fullWidth
-              id = "password"
-              label = "비밀번호"
-              type = "password"
-              value = {user_pw}
-              onChange = {handlePwChange}
-              size = "medium"
-              onKeyPress = {onKeyPress}
-              />
-            </Grid>
-            <Grid item xs = {12}>
-              <TextField
-              name = "passwordcheck"
-              variant = "standard"
-              required
-              fullWidth
-              id = "passwordcheck"
-              label = "비밀번호 확인"
-              type = "password"
-              value = {user_pwcheck}
-              onChange = {handlePwCheckChange}
+              //autoFocus
               size = "medium"
               onKeyPress = {onKeyPress}
               />
@@ -226,7 +159,7 @@ export default function SignUp() {
           onClick = {handleSubmit}
           style={{backgroundColor:"#50bcdf"}}
           >
-            SIGNUP
+              비밀번호 재설정
           </Button>
           &nbsp; &nbsp;
           <Link href = "/" variant = "body2" style={{color:"#676565",fontWeight: "bold"}}>

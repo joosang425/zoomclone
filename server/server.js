@@ -28,23 +28,6 @@ function getToday() {
   return temp;
 }
 
-function checkTime(i) {
-  if (i < 10) {
-    i = "0" + i;
-  }
-  return i;
-}
-
-function getTime(){
-  var today = new Date();
-  var h = today.getHours();
-  var m = today.getMinutes();
-  // add a zero in front of numbers<10
-  m = checkTime(m);
-  var time = h + ":" + m;
-  return time;
-}
-
 /******************************Video *********************************/
 
 app.set('view engine', 'ejs')
@@ -222,6 +205,7 @@ else {
 /****************************** Frontend *********************************/
 
 if (process.env.NODE_ENV == 'production') {
+
   app.use(express.static(path.join(__dirname, '../meetingnote/build')));
 
   // 일반 페이지는 react 빌드 파일로 라우트
@@ -237,17 +221,22 @@ if (process.env.NODE_ENV == 'production') {
   app.get('/script', (req, res) => {
     res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'));
   });
+  app.get('/find_pw', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'));
+  });
+  app.get('/pw_change', (req, res) => {
+    res.sendFile(path.join(__dirname, '../meetingnote/build/index.html'));
+  });
 
 }
 
 /****************************** Web server code *********************************/
 
-//  회원 확인 후 로그인 
 app.post('/check_login', function (req, res) {
   var id = req.body.user_id;
   var pw = req.body.user_pw;
   var sql = 'SELECT * FROM USER WHERE user_id=? and user_pw = SHA2(?, 224)';
-  mysqlDB.query(sql, [id, pw], function (err, results) {
+  mysqlDB.query(sql, [id,pw], function (err, results) {
     if (err) return res.send({ code: 11, msg: `${err}` });
 
     if (!results[0]) {
@@ -276,6 +265,34 @@ app.post('/registration', function (req, res) {
     else return res.send({ code: 0, msg: "request success" });
   });
 });
+
+//비밀번호 찾기
+app.post('/find', function(req, res){
+  var id = req.body.user_id;
+  var phone = req.body.user_phone;
+  var sql = 'SELECT user_pw FROM USER WHERE user_id = ? AND user_phone=?';
+  mysqlDB.query(sql, [id, phone], function (err, results) {
+    if (err) {
+      console.log(err);
+      return res.send({ code: 3, msg: `${err}` });
+    }
+    else return res.send({ code: 0, msg: "request success"});
+  });
+});
+
+//비밀번호 바꾸기
+app.post('/change', function(req, res){
+  var pw = req.body.user_pw;
+  var id = req.body.user_id;
+  var sql = 'UPDATE USER SET user_pw = SHA2(?, 224) WHERE user_id = ?';
+  mysqlDB.query(sql, [pw, id], function (err, results) {
+    if (err) {
+      console.log(err);
+      return res.send({ code: 3, msg: `${err}` });
+    }
+    else return res.send({ code: 0, msg: "request success"});
+  });
+}); 
 
 // 회의 만들기
 app.post('/meet_create', function (req, res) {

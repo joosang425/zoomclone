@@ -22,15 +22,15 @@ const useStyles = makeStyles((theme) => ({
       }
   },
   Chip: {
-      backgroundColor: "#3f51b5",
+      backgroundColor: "#cfe8ec",
       marginTop:"1%",
       marginRight:"3%",
-      height:"15%",
+      height:"10%",
       fontSize: 14
   },
   ScriptChip: {
       fontSize: 14,
-      backgroundColor: "#000000",
+      backgroundColor: "#cdcdcd",
       color: "#ffffff",
       marginTop:"1%",
       marginRight:"3%",
@@ -47,8 +47,8 @@ const useStyles = makeStyles((theme) => ({
       margin:"auto",
       borderRadius:10,
       padding:0,
-      marginTop: "5%",
       marginBottom:"2%",
+      marginTop:"5%",
   },
   ScheduledName: {
       display: "flex",
@@ -147,21 +147,21 @@ export default function Finished(prop) {
 
   return (
     <div className={classes.root}>
-    <Paper elevation={3} style={{height:"100%", paddingTop:"1%"}}>
+    <Paper elevation={3} style={{height:"100%", paddingTop:"1%",boxShadow:"none"}}>
         <Typography variant="h6" align="center">
-            <span style={{fontWeight: "bold", textDecoration:"underline overline", textDecorationColor:"#3f51b5"}}>Finished</span>   
+            <span style={{fontWeight: "bold", textDecoration:"underline", textDecorationColor:"#99ccff"}}>종료된 회의방</span>   
         </Typography>
-        <div style={{backgroundColor:"#eaeaea", width:"90%", height:"85%",borderRadius:10, margin:"auto"}}>
+        <div style={{backgroundColor:"#f7f6e1", width:"90%", height:"85%",borderRadius:10, margin:"3% auto auto",boxShadow:"0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)"}}>
         <List className={classes.list}>
         {list && list.map(data => (
                         <ListItem key={data.meet_name} id='data' className={classes.data}>
                             <div style={{display:'block', width:"100%", margin:"2%"}}>
                                 <div className={classes.ScheduledName}>
                                 <DeleteForever onClick={()=> handleDeleteIcon(data.meet_id)} className={classes.deleteBtn} color="error"/>
-                                <span style={{fontWeight:"bold"}}>{data.meet_name}</span>
+                                <span style={{fontWeight:"bold", color:"black"}}>{data.meet_name}</span>
                                 </div>
                                 <Grid>
-                                    <Chip className={classes.Chip} id="meet_date" label={data.meet_date}  style={ {color: "#ffffff"}}/>
+                                    <Chip className={classes.Chip} id="meet_date" label={data.meet_date}/>
                                     <Chip className={classes.ScriptChip} id="script" onClick={() => handleClickScript(data.meet_id)} icon={<DescriptionIcon style={{ color: "white" }}/>} label="SCRIPT"/>
                                 </Grid>
                             </div>

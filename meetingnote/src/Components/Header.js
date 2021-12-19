@@ -6,11 +6,14 @@ import LogoutIcon from '@material-ui/icons/LockOpen';
 const useStyles = makeStyles((theme) => ({
   header: {
     minWidth: 1000,
-    backgroundColor: "#000000",
+    backgroundColor: "#72c7fc",
     width: "100%",
     display: "flex",
     justifyContent: "flex-end",
     alignItems: "center"
+  },
+  divStyle: {
+    backgroundColor:"#72c7fc",
   },
 }));
 
@@ -27,8 +30,8 @@ export default function Header(prop) {
   return (
     <div className={classes.header}>
       <span style={{color: "#ffffff", fontWeight: "bold", maxWidth: "100%", marginRight: "1%"}}>{sessionStorage.getItem("user_name")}님</span>
-      <Button style={{margin: "1%"}} onClick={handleClickLogout} color="primary" variant="contained">
-        <LogoutIcon />&nbsp; LOGOUT
+      <Button className={classes.divStyle} style={{margin: "1%",backgroundColor:"#0065fc"}} onClick={handleClickLogout} color="primary" variant="contained">
+        <LogoutIcon />&nbsp; 로그아웃
       </Button>
     </div>
   );

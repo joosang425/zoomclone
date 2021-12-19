@@ -8,7 +8,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 const useStyles = makeStyles((theme) => ({
   header: {
       minWidth:850,
-      backgroundColor: "#000000",
+      backgroundColor: "#72c7fc",
       width: "100%",
       display: "flex",
   },
@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
       justifyContent: "flex-end",
       alignItems: "center"
   },
-      headerBtn: {
+  headerBtn: {
       marginLeft: "5%"
   },
   root: {
@@ -28,9 +28,10 @@ const useStyles = makeStyles((theme) => ({
   },
   Chip: {
       fontSize: 14,
-      backgroundColor: "#3f51b5",
+      backgroundColor: "#0065fc",
       marginLeft:"1%",
       height:"10%",
+      color:"#ffffff"
   },
   grid: {
       display:"flex",
@@ -86,14 +87,15 @@ export default function ScriptTitle(prop) {
   return (
     <div>
     <div className={classes.header}>
-        <Button style={{margin:"1%", width:"6%", minWidth:90, padding:0}} color="primary" variant="contained" href="/main" >
-            <ArrowBackIcon/>&nbsp;Back
+        <Button style={{margin:"1%", width:"6%", minWidth:90, padding:0, backgroundColor:"#0065fc"}} color="primary" variant="contained" href="/main" >
+            <ArrowBackIcon/>&nbsp;메인
         </Button>
         <div className={classes.leftBtn}>
-            <span style={{color: "#ffffff", fontWeight: "bold", maxWidth: "100%", marginRight:"1%" }}>{sessionStorage.getItem("user_name")}님</span>
-            <Button style={{margin:"1%"}} onClick={handleClickLogout} color="primary" variant="contained">
-                <LogoutIcon/>&nbsp;LOGOUT
+          <span style={{color: "#ffffff", fontWeight: "bold", maxWidth: "100%", marginRight:"1%" }}>{sessionStorage.getItem("user_name")}님</span>
+            <Button style={{margin:"1%", backgroundColor:"#0065fc", color:"#ffffff"}} onClick={handleClickLogout} color="#72c7fc" variant="contained">
+                <LogoutIcon/>&nbsp;로그아웃
             </Button>
+            
         </div>
     </div>
       <div className={classes.root}>
@@ -103,7 +105,7 @@ export default function ScriptTitle(prop) {
             </Typography>
         </Grid>
         <Grid className={classes.grid}>
-            <Chip className={classes.Chip} id="meet_date" icon={<EventIcon style={{color: "white" }}/>} label={data.meet_date} style={ {color: "#ffffff"}}/>
+            <Chip className={classes.Chip} id="meet_date" icon={<EventIcon style={{color: "#ffffff"}}/>} label={data.meet_date} />
         </Grid>
       </div>
     </div>     

@@ -8,8 +8,9 @@ const useStyles = makeStyles((theme) => ({
   body: {
     minWidth: 1000,
     height: window.innerHeight - 62,
-    justifyContent:"center"
+    justifyContent:"center",
   },
+
 }));
 
 export default function InteractiveList() {
@@ -19,8 +20,9 @@ export default function InteractiveList() {
     <div style={{width: "100%", height: "90%"}}>
       <Header />
       <div className={classes.body}>
-        <div style={{display: "flex", height: "90%", alignItems: "center", justifyContent: "center", width: "94%", margin: "auto"}}>
-          <Scheduled /><Finished />
+        <div style={{display: "flex", height: "100%", alignItems: "center", justifyContent: "center", width: "94%", margin: "auto"}}>
+          <Scheduled />
+          <Finished />
         </div>
       </div>
     </div>

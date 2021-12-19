@@ -6,7 +6,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
       width:"85%",
       height:"93%",
-      marginTop:"1%",
+      marginTop:"20px",
   },
   paper: {
       width:"100%",
@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
       marginTop:"0.5%"
   },
   scriptContainer: {
-      backgroundColor:"#eaeaea", 
+      backgroundColor:"#f7f6e1", 
       width:"89%", 
       height:"80%",
       padding: "3%",
@@ -26,6 +26,8 @@ const useStyles = makeStyles((theme) => ({
       '&::-webkit-scrollbar' : {
           display : 'none'
       },
+      boxShadow:"0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)",
+
   },
 }));
 
@@ -56,16 +58,19 @@ export default function MeetScript(prop) {
 
   return (
     <div className={classes.root}>
-      <Paper elevation={3} className={classes.paper}>
+      {/* <Paper elevation={3} className={classes.paper}> */}
         <Typography variant="h6" align="center">
-          <span style={{fontWeight: "bold", textDecoration: "underline overline", textDecorationColor: "#3f51b5"}}>Script</span>
+          <span style={{fontWeight: "bold", textDecoration: "underline", textDecorationColor: "#99ccff"}}>회의록</span>
         </Typography>
+        <br/>
         <div className={classes.scriptContainer}>
+          <div style={{height:"100%",overflow:"auto"}}>
           {list && list.map(data => (
             <Typography key={Math.random()}>{data}</Typography>
           ))}
+          </div>
         </div>
-      </Paper>
+      {/* </Paper> */}
     </div>
   );
 }

@@ -20,24 +20,28 @@ const useStyles = makeStyles((theme) => ({
   },
   search: {
     position: 'relative',
-    borderRadius: 20,
-    backgroundColor: "#a9a9a9",
-    marginTop: "25%",
+    borderRadius: 7,
+    backgroundColor: "#ffffff",
+    marginTop: "30%",
     marginRight: "1%",
     width: '70%'
   },
   Secsearch: {
     position: 'relative',
-    borderRadius: 20,
-    backgroundColor: "#a9a9a9",
+    borderRadius: 7,
+    backgroundColor: "#ffffff",
     marginTop: "15%",
     marginRight: "1%",
     width: '70%'
   },
   Button: {
-    width: "20%",
-    marginLeft: "3%"
+    width: "100px",
+    marginLeft: "3%",
+    backgroundColor:"#72c7fc",
+    fontSize:"medium",
+    fontWeight:"bold"
   },
+
 }));
 
 export default function Scheduled(prop) {
@@ -127,13 +131,13 @@ export default function Scheduled(prop) {
 
   return (
     <div className={classes.root}>
-        <Paper elevation={3} style={{height:"100%", paddingTop:"1%"}}>
+        <Paper elevation={3} style={{height:"100%", paddingTop:"1%",boxShadow:"none"}}>
             <Typography variant="h6" align="center">
-                <span style={{fontWeight: "bold", textDecoration:"underline overline", textDecorationColor:"#3f51b5"}}>Scheduled</span>   
+                <span style={{fontWeight: "bold", textDecoration:"underline", textDecorationColor:"#99ccff"}}>회의방 입장</span>   
             </Typography>
-            <div style={{backgroundColor: "#eaeaea", width: "90%", height: "85%", borderRadius: 10, margin: "auto"}}>
+            <div style={{backgroundColor: "#f7f6e1", width: "90%", height: "85%", borderRadius: 10, margin: "3% auto auto",boxShadow:"0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)"}}>
               <InputBase className={classes.search}
-              placeholder = "Input..."
+              placeholder = "회의방 번호를 입력해주세요"
               classes = {{
                 root: classes.inputRoot,
                 input: classes.inputInput,
@@ -144,10 +148,10 @@ export default function Scheduled(prop) {
               onKeyPress= { onKeyPress }
               />
               <Button className={classes.Button} height="50" variant="contained" color="primary" onClick={handleEnterMeet}>
-                START
+                참가
               </Button>
               <InputBase className={classes.Secsearch}
-              placeholder="Input..."
+              placeholder="회의방 이름을 입력해주세요"
               classes= {{
                 root: classes.inputRoot,
                 input: classes.inputInput,
@@ -158,7 +162,7 @@ export default function Scheduled(prop) {
               onKeyPress={ onKeyPress }
               />
               <Button className={classes.Button} height="50" variant="contained" color="primary" onClick={handleSubmit}>
-                CREATE
+                만들기
               </Button>
             </div>
         </Paper> 
